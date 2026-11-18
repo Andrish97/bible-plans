@@ -57,6 +57,10 @@ for src,dst,why in D.get('move_part',[]):
     om=owner_map(); j=om[key(dst)]; t=S[j]
     pj=next(n for n,p in enumerate(t['parts']) if key(dst) in [tuple(x) for x in p['ks']])
     t['parts'].insert(pj if bef else pj+1,part); t['why'].append('ręcznie (nie Tyndale): '+why)
+for a,b in D.get('join',[]):
+    om=owner_map(); i,j=om[key(a)],om[key(b)]
+    if j!=i+1: errors.append(f'join niesąsiadujące: {a} {b}'); continue
+    S[i]['parts']+=S[j]['parts']; S[i]['why']+=S[j]['why']; del S[j]
 om=owner_map(); threads=[]
 for r,name in D['threads']:
     i=om[key(r)]

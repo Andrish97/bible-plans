@@ -679,10 +679,6 @@
    "Amos"
   ],
   [
-   "2Kgs 14:28",
-   "Ostatni królowie Izraela, Jotam, powołanie Izajasza"
-  ],
-  [
    "2Kgs 16:1",
    "Achaz i proroctwa Izajasza"
   ],
@@ -703,12 +699,12 @@
    "Przeciwnicy i śmierć Salomona"
   ],
   [
-   "Hos 4:1",
-   "Ozeasz: ostatnie lata Izraela (Oz 4–14)"
+   "Hos 7:1",
+   "Ozeasz: ostatnie lata Izraela (Oz 7–14)"
   ],
   [
    "Isa 1:1",
-   "Izajasz: wezwanie do Judy (Iz 1–5)"
+   "Izajasz za Ozjasza, Jotam, Micheasz (Iz 1,1; 2–6; Mi 1)"
   ],
   [
    "2Kgs 16:19",
@@ -767,7 +763,7 @@
    "Micheasz za Hiskiasza (Mi 2–7)"
   ],
   [
-   "2Chr 32:1",
+   "Isa 10:5",
    "Najazd Sennacheryba"
   ],
   [
@@ -793,6 +789,10 @@
   [
    "Jer 1:1",
    "(część 5) Jeremiasz i Jozjasz"
+  ],
+  [
+   "2Kgs 14:28",
+   "Ostatni królowie Izraela"
   ]
  ],
  "split": [
@@ -1245,10 +1245,6 @@
    "2Kgs 15:27"
   ],
   [
-   "Isa 1:1",
-   "Isa 1:2"
-  ],
-  [
    "2Chr 31:1",
    "2Chr 31:2"
   ],
@@ -1369,6 +1365,48 @@
    "2Chr 31:21",
    "2Kgs 18:8",
    "2 Krn 29,3: „w pierwszym roku swego panowania, w pierwszym miesiącu” – oczyszczenie świątyni, Pascha w drugim miesiącu tego roku (30,2) i reforma (31) należą do 1. roku Hiskiasza, przed upadkiem Samarii w jego 6. roku (2 Krl 18,10)."
+  ],
+  [
+   "Isa 2:1",
+   "Isa 5:30",
+   "<2Kgs 15:6",
+   "zasada: proroctwo stoi tam, gdzie zostało wypowiedziane – „pełna jest jego ziemia srebra i złota… koni… rydwanów” (Iz 2,7) – zamożność za Ozjasza, przed powołaniem w roku jego śmierci (Iz 6,1)."
+  ],
+  [
+   "Isa 1:1",
+   "Isa 1:1",
+   "<Isa 2:1",
+   "tytuł księgi (Ozjasz, Jotam, Achaz, Hiskiasz) przed pierwszymi proroctwami."
+  ],
+  [
+   "Isa 1:2",
+   "Isa 1:31",
+   "2Kgs 18:18",
+   "zasada: proroctwo stoi tam, gdzie zostało wypowiedziane – „ziemia pustkowiem, miasta spalone… córka Syjonu pozostała jak szałas w winnicy, jak miasto oblężone” (Iz 1,7–8) – Sennacheryb zdobył wszystkie warowne miasta Judy, Jerozolima ocalała (2 Krl 18,13)."
+  ],
+  [
+   "Isa 10:5",
+   "Isa 12:6",
+   "<2Chr 32:1",
+   "zasada: proroctwo stoi tam, gdzie zostało wypowiedziane – Samaria już upadła: „jak uczyniłem Samarii i jej bożkom, tak uczynię Jerozolimie” (Iz 10,11); pochód Asyryjczyka przez Michmas pod Nob (10,28–32) – przed najazdem Sennacheryba."
+  ],
+  [
+   "Hos 4:1",
+   "Hos 6:11",
+   "Isa 8:22",
+   "zasada: proroctwo stoi tam, gdzie zostało wypowiedziane – alarm w Gibei, Ramie i Bet-Awen (Oz 5,8) i „udał się Efraim do Asyrii” (5,13) – wojna syryjsko-efraimska za Achaza (2 Krl 16,5; Iz 7)."
+  ],
+  [
+   "2Kgs 16:19",
+   "Isa 16:14",
+   "<2Kgs 18:1",
+   "śmierć Achaza przed objęciem władzy przez Hiskiasza (2 Krl 18,1: w 3. roku Ozeasza), a więc przed upadkiem Samarii (6. rok Hiskiasza); wyrocznie z Iz 13–16 wypowiedziane „w roku śmierci króla Achaza” (14,28)."
+  ]
+ ],
+ "join": [
+  [
+   "Isa 1:1",
+   "Isa 2:1"
   ]
  ]
 }
