@@ -5,12 +5,33 @@ def key(r):
 def owner_map():
     return {tuple(k):i for i,st in enumerate(S) for p in st['parts'] for k in p['ks']}
 errors=[]
+def kparts(st): return [tuple(p['ks'][0]) for p in st['parts']]
+# 1) rozbicia: nowa historia zaczyna się od części, której pierwszy werset podano
+for r in D.get('split',[]):
+    k=key(r); om=owner_map(); i=om.get(k)
+    st=S[i]; firsts=kparts(st)
+    if k not in firsts:
+        errors.append(f'split: {r} nie jest początkiem części w historii „{st["title"]}” (części zaczynają się od {[f"{bv.OSIS[x[0]]} {x[1]}:{x[2]}" for x in firsts]})'); continue
+    j=firsts.index(k)
+    if j==0: continue
+    new={'title':st['parts'][j]['title'] or st['title']+' (cz.)','parts':st['parts'][j:],'why':['ręcznie: rozdzielone'],'days':st['days']}
+    st['parts']=st['parts'][:j]; S.insert(i+1,new)
+# 2) połączenia
 for grp in D['merge']:
+
     om=owner_map(); idx=sorted({om[key(r)] for r in grp})
     if idx!=list(range(idx[0],idx[-1]+1)): errors.append(f'merge niesąsiadujące: {grp} -> {idx}'); continue
     head=S[idx[0]]
     for i in idx[1:]: head['parts']+=S[i]['parts']; head['why']+=S[i]['why']+['ręcznie: relacja równoległa']
     for i in reversed(idx[1:]): del S[i]
+# 3) przeniesienia: historia zawierająca pierwszy werset dołącza do historii zawierającej drugi
+for src,dst in D.get('move',[]):
+    om=owner_map(); i=om[key(src)]; st=S.pop(i)
+    om=owner_map(); j=om[key(dst)]; tgt=S[j]
+    dk=key(dst); pos=next(n for n,p in enumerate(tgt['parts']) if dk in [tuple(x) for x in p['ks']])
+    last=tuple(st['parts'][-1]['ks'][-1])
+    before = last[0]==dk[0] and last[1]==dk[1] and last[2]+1==dk[2]
+    tgt['parts'][pos if before else pos+1:pos if before else pos+1]=st['parts']; tgt['why'].append('ręcznie: przeniesione do swojej historii')
 om=owner_map(); threads=[]
 for r,name in D['threads']:
     i=om[key(r)]
