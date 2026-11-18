@@ -24,6 +24,12 @@ for grp in D['merge']:
     head=S[idx[0]]
     for i in idx[1:]: head['parts']+=S[i]['parts']; head['why']+=S[i]['why']+['ręcznie: relacja równoległa']
     for i in reversed(idx[1:]): del S[i]
+# 2b) połączenie wszystkich historii od tej z pierwszym wersetem do tej z drugim
+for a,b in D.get('merge_span',[]):
+    om=owner_map(); i,j=om[key(a)],om[key(b)]
+    if j<=i: errors.append(f'merge_span: {a}..{b} -> {i}..{j}'); continue
+    for x in S[i+1:j+1]: S[i]['parts']+=x['parts']; S[i]['why']+=x['why']
+    S[i]['why'].append('ręcznie: jedna historia (połączone krótkie sekcje)'); del S[i+1:j+1]
 # 3) przeniesienia: historia zawierająca pierwszy werset dołącza do historii zawierającej drugi
 for src,dst in D.get('move',[]):
     om=owner_map(); i=om[key(src)]; st=S.pop(i)
@@ -41,9 +47,11 @@ for src,dst,why in D.get('place',[]):
 for src,dst,why in D.get('move_part',[]):
     om=owner_map(); i=om[key(src)]; st=S[i]
     pi=next(n for n,p in enumerate(st['parts']) if tuple(p['ks'][0])==key(src)); part=st['parts'].pop(pi)
+    bef=dst.startswith('<'); dst=dst.lstrip('<')
+    if not st['parts']: S.pop(i)
     om=owner_map(); j=om[key(dst)]; t=S[j]
     pj=next(n for n,p in enumerate(t['parts']) if key(dst) in [tuple(x) for x in p['ks']])
-    t['parts'].insert(pj+1,part); t['why'].append('ręcznie (nie Tyndale): '+why)
+    t['parts'].insert(pj if bef else pj+1,part); t['why'].append('ręcznie (nie Tyndale): '+why)
 om=owner_map(); threads=[]
 for r,name in D['threads']:
     i=om[key(r)]
