@@ -38,3 +38,4 @@ for(const info of list){
   }
 }
 console.log(`sprawdzone granice: ${total}, podejrzane: ${bad}`);
+if(bad) process.exit(1);

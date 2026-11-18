@@ -14,8 +14,8 @@ export function toCsv(rows, opt){
   return lines.join('\r\n') + '\r\n';
 }
 
-export function download(name, text, type = 'text/csv;charset=utf-8'){
-  const blob = new Blob(['﻿' + text], {type});
+export function download(name, text, type = 'text/csv;charset=utf-8', bom = true){
+  const blob = new Blob([(bom ? '\ufeff' : '') + text], {type});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = name;

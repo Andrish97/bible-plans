@@ -12,6 +12,8 @@ import {renderReadings, booksOf} from './ui/readings.js';
 import {renderPreview} from './ui/preview.js';
 import {toCsv, download} from './export/csv.js';
 import {buildPrint, TEMPLATES} from './export/print.js';
+import {toIcs} from './export/ics.js';
+import {encodePlan, decodePlan, planUrl} from './share.js';
 
 const S = {
   canon: null,
@@ -37,11 +39,14 @@ async function boot(){
   fillStaticSelects();
   CONTROLS.forEach(id => DEF.set(id, val(id)));
   restore();
+  const fromLink = restoreFromLink();
   enhanceSelects();
   initCalendar($('start'), $('calBtn'), $('calPop'));
   wire();
   initMobile();
+  initPwa();
   await switchTranslation();
+  if(fromLink) toast(fromLink === 'ok' ? 'Wczytano plan z linku.' : 'Link do planu jest uszkodzony – pokazuję ostatnie ustawienia.');
 }
 
 function fillStaticSelects(){
@@ -65,6 +70,35 @@ function restore(){
   }
   if(Array.isArray(saved.days)) setWeekdays(saved.days);
   if(saved.readings?.cont) S.readings = {...structuredClone(DEFAULT_READINGS), ...saved.readings};
+}
+
+/** Plan z linku (?plan=…): zastępuje zapisane ustawienia. Zwraca 'ok', 'bad' albo null. */
+function restoreFromLink(){
+  const code = new URLSearchParams(location.search).get('plan');
+  if(!code) return null;
+  history.replaceState(null, '', location.pathname + location.hash);   // link działa raz, dalej zwykłe zapamiętywanie
+  const p = decodePlan(code);
+  if(!p) return 'bad';
+  DEF.forEach((v, id) => setVal(id, v));
+  for(const [id, v] of Object.entries(p.controls)){
+    const c = ctrl(id);
+    if(!c || !CONTROLS.includes(id)) continue;
+    if(c.tagName === 'SELECT' && ![...c.options].some(o => o.value === v)) continue;
+    setVal(id, v);
+  }
+  setWeekdays(p.days || range(0, 6));
+  if(p.readings){
+    const d = structuredClone(DEFAULT_READINGS);
+    S.readings = {n: p.readings.n, cont: [...p.readings.cont, ...d.cont.slice(p.readings.cont.length)],
+      own: [...(p.readings.own || []), ...d.own].slice(0, 4)};
+  }
+  return 'ok';
+}
+
+function currentState(){
+  const controls = {};
+  CONTROLS.forEach(id => { controls[id] = val(id); });
+  return {controls, days: [...weekdays()].sort(), readings: S.readings};
 }
 
 function persist(){
@@ -96,6 +130,8 @@ function wire(){
   $('reset').addEventListener('click', reset);
   $('dl').addEventListener('click', exportCsv);
   $('pdf').addEventListener('click', exportPdf);
+  $('ics').addEventListener('click', exportIcs);
+  $('share').addEventListener('click', sharePlan);
 }
 
 let raf = 0;
@@ -255,7 +291,7 @@ function update(){
   refreshControls(parts);
   const msgs = problems(parts);
   showWarn(msgs);
-  $('dl').disabled = $('pdf').disabled = msgs.length > 0;
+  $('dl').disabled = $('pdf').disabled = $('ics').disabled = $('share').disabled = msgs.length > 0;
   persist();
   document.querySelector('.table-wrap').classList.toggle('stale', msgs.length > 0);
   if(msgs.length) return;
@@ -310,6 +346,48 @@ function exportPdf(){
   document.title = safeName();
   addEventListener('afterprint', () => { document.title = old; }, {once: true});
   print();
+}
+
+function exportIcs(){
+  if(!S.view || $('ics').disabled) return;
+  const title = val('ptitle') || 'Plan czytania Biblii';
+  download(safeName() + '.ics', toIcs(S.view.rows, {title, parts: S.view.parts, reminder: val('reminder')}), 'text/calendar;charset=utf-8', false);
+  toast('Pobrano plik kalendarza. Otwórz go albo zaimportuj w Kalendarzu Google / Apple / Outlook.');
+}
+
+async function sharePlan(){
+  if($('share').disabled) return;
+  const defaults = {controls: Object.fromEntries(DEF), days: range(0, 6)};
+  const url = planUrl(encodePlan(currentState(), defaults));
+  if(navigator.share && matchMedia('(pointer: coarse)').matches){
+    try{ await navigator.share({title: val('ptitle') || 'Plan czytania Biblii', url}); return; }catch(e){ if(e.name === 'AbortError') return; }
+  }
+  try{ await navigator.clipboard.writeText(url); toast('Skopiowano link do planu.'); }
+  catch(e){ prompt('Skopiuj link do planu:', url); }
+}
+
+let toastTimer = 0;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, 3500);
+}
+
+// ---------------------------------------------------------------- aplikacja instalowana (PWA), działanie bez internetu
+function initPwa(){
+  if('serviceWorker' in navigator && location.protocol !== 'file:'){
+    navigator.serviceWorker.register('sw.js').catch(err => console.warn('Service worker:', err));
+  }
+  let deferred = null;
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; $('install').hidden = false; });
+  addEventListener('appinstalled', () => { $('install').hidden = true; deferred = null; });
+  $('install').addEventListener('click', async () => {
+    if(!deferred) return;
+    deferred.prompt();
+    await deferred.userChoice;
+    deferred = null; $('install').hidden = true;
+  });
 }
 
 // ---------------------------------------------------------------- telefon: ustawienia i podgląd jako osobne ekrany

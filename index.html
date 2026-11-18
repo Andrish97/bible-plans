@@ -7,6 +7,7 @@
 <meta name="description" content="Plan czytania Biblii: po kolei lub chronologicznie, w wybranym przekładzie. Eksport do CSV i PDF.">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#7a2e1d">
 <script src="js/theme-init.js"></script>
 <link rel="stylesheet" href="assets/css/app.css">
@@ -25,9 +26,12 @@
         <p>Wybierz przekład, czytania i kalendarz. Plan pobierzesz jako CSV albo PDF.</p>
       </div>
     </div>
+    <div class="hdr-actions">
+    <button type="button" class="ghost install-btn" id="install" hidden>Zainstaluj aplikację</button>
     <div class="theme" id="theme">
       <button type="button" class="icon-btn" id="themeBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Motyw" title="Motyw"></button>
       <ul class="menu" id="themeMenu" role="menu" hidden></ul>
+    </div>
     </div>
   </div>
 </header>
@@ -168,6 +172,19 @@
       <p class="hint warn-text" id="sepErr" hidden></p>
     </div>
     <label class="check"><input type="checkbox" id="csvDate"> Dodaj w CSV kolumnę z datą</label>
+    <div class="field">
+      <span class="lab">Przypomnienie w kalendarzu</span>
+      <select id="reminder">
+        <option value="">Bez przypomnienia</option>
+        <option value="06:00">o 6:00</option>
+        <option value="07:00" selected>o 7:00</option>
+        <option value="08:00">o 8:00</option>
+        <option value="12:00">o 12:00</option>
+        <option value="18:00">o 18:00</option>
+        <option value="20:00">o 20:00</option>
+        <option value="21:00">o 21:00</option>
+      </select>
+    </div>
   </fieldset>
 
   <button type="button" class="view-btn" id="toPreview">Podgląd planu →</button>
@@ -182,7 +199,9 @@
     </div>
     <div class="actions">
       <input type="text" id="fname" value="plan_czytania" aria-label="Nazwa pliku" title="Nazwa pliku">
-      <button type="button" class="ghost" id="dl">Pobierz CSV</button>
+      <button type="button" class="ghost" id="dl">CSV</button>
+      <button type="button" class="ghost" id="ics" title="Plik do zaimportowania w Kalendarzu Google, Apple albo Outlooku">Kalendarz</button>
+      <button type="button" class="ghost" id="share" title="Skopiuj link z tym planem">Udostępnij</button>
       <button type="button" id="pdf">Drukuj / PDF</button>
     </div>
   </div>
@@ -197,5 +216,6 @@
 </div>
 
 <div id="printRoot"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

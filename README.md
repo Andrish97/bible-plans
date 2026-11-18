@@ -3,6 +3,10 @@
 Aplikacja w przeglądarce do układania planów czytania Biblii: po kolei albo chronologicznie, w wybranym
 polskim przekładzie, z eksportem do CSV i PDF (kilka szablonów wydruku).
 
+Funkcje: plan po kolei lub chronologicznie w wybranym przekładzie, eksport do PDF (5 szablonów), CSV
+i kalendarza (.ics z przypomnieniem), link do planu (`?plan=…`, przycisk „Udostępnij”), instalacja jako
+aplikacja i działanie bez internetu (service worker `sw.js`).
+
 Działa jako statyczna strona (GitHub Pages). Lokalnie potrzebny jest dowolny serwer HTTP, bo przeglądarka nie
 wczyta modułów i plików JSON z `file://`:
 
@@ -99,5 +103,11 @@ dokładnie raz. `node tools/verify_boundaries.mjs` sprawdza po treści każdą g
 python3 tools/convert_mybible.py        # sources/mybible/*.mybible -> data/translations/
 node tools/check.mjs                    # test kompletności planów
 node tools/verify_boundaries.mjs        # weryfikacja treściowa granic chronologii
+node tools/check_sw.mjs                 # czy sw.js zapisuje offline wszystkie pliki aplikacji
 python3 tools/extract_legacy.py OLD.html  # jednorazowo: chronologia i nagłówki BW z dawnego index.html
 ```
+
+Te same testy uruchamia GitHub Actions (`.github/workflows/check.yml`) przy każdym wypchnięciu zmian, razem
+z ponowną konwersją modułów i sprawdzeniem, czy `data/` zgadza się ze źródłami.
+
+Po zmianie listy plików aplikacji dopisz je do `SHELL` w `sw.js` i podnieś `VERSION`.

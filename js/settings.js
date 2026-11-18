@@ -15,7 +15,7 @@ export function range(a, b){ const r = []; for(let i = a; i <= b; i++) r.push(i)
 
 /** Kontrolki zapisywane w przeglądarce (id elementu -> rodzaj). */
 export const CONTROLS = ['translation', 'abbr', 'refStyle', 'preset', 'nread', 'order', 'noMixOn', 'noMixMode', 'unit', 'noSplitCh', 'useHeads',
-  'start', 'ndays', 'template', 'ptitle', 'mono', 'sep', 'sepOwn', 'csvDate', 'fname'];
+  'start', 'ndays', 'template', 'ptitle', 'mono', 'sep', 'sepOwn', 'csvDate', 'reminder', 'fname'];
 
 /**
  * Łańcuch ustawień planu: zmiana jednego przywraca domyślne wartości wszystkich kolejnych.
