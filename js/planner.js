@@ -48,7 +48,7 @@ export function buildGroups(tr, books, chronEntries, mode){
 const groupWeight = (tr, g, mode) => g.u.reduce((s, u) => s + weight(tr, u, mode), 0);
 
 /**
- * Podział ciągu grup na K dni (zachłannie, z karami za złe miejsca cięcia).
+ * Podział ciągu grup na K dni: programowanie dynamiczne po granicach dni, z karami za złe miejsca cięcia.
  * Kolejność ważności: nagłówki, nie mieszaj ksiąg, nie dziel rozdziałów, równomierność.
  */
 export function splitGroups(tr, groups, K, mode, opt){
@@ -70,22 +70,61 @@ export function splitGroups(tr, groups, K, mode, opt){
   const sameBookCut = e => e < G && lastU(e - 1)[0] === first(e)[0];
   const chapCut = e => e < G && lastU(e - 1)[0] === first(e)[0] && lastU(e - 1)[1] === first(e)[1];
   const inside = e => e < G && groups[e - 1].link !== null && groups[e - 1].link === groups[e].link;
-  const ends = []; let prev = 0;
-  for(let k = 1; k < K; k++){
-    const target = total * k / K;
-    const lo = prev + 1, hi = G - (K - k);
-    let best = lo, bestCost = Infinity;
-    for(let e = lo; e <= hi; e++){
-      const cost = Math.abs(cum[e - 1] - target)
-        + (inside(e) ? PEN : 0)
-        + (useHeads && !headCut(e) ? HEADS_PEN : 0)
-        + (noSplitCh && chapCut(e) ? CH_PEN : 0)
-        + (softMix && sameBookCut(e) ? NOMIX_PEN : 0);
-      if(cost < bestCost){ bestCost = cost; best = e; }
+  // kary za cięcie po każdej granicy liczone raz
+  // rozdział: ciąg grup z tego samego rozdziału; nie zostawiamy 1–3 wersetów, a krótkich rozdziałów nie dzielimy
+  const MIN_PART = 4, SHORT_CH = 30;
+  const key = i => groups[i].u[0][0] * 1000 + groups[i].u[0][1];
+  const runStart = new Int32Array(G), runEnd = new Int32Array(G);
+  for(let i = 0; i < G; ){ let j = i; while(j < G && key(j) === key(i)) j++; for(let k = i; k < j; k++){ runStart[k] = i; runEnd[k] = j; } i = j; }
+  const pen = new Float64Array(G + 1);
+  for(let e = 1; e < G; e++){
+    pen[e] = (inside(e) ? PEN : 0) + (useHeads && !headCut(e) ? HEADS_PEN : 0) + (noSplitCh && chapCut(e) ? CH_PEN : 0) + (softMix && sameBookCut(e) ? NOMIX_PEN : 0);
+    if(chapCut(e)){
+      const left = e - runStart[e - 1], right = runEnd[e] - e, len = runEnd[e] - runStart[e - 1];
+      if(left < MIN_PART || right < MIN_PART || (noSplitCh && len <= SHORT_CH)) pen[e] = Infinity;
     }
-    ends.push(best); prev = best;
   }
-  ends.push(G);
+  const valid = (p, e) => e > p && !(e - p < MIN_PART && key(p) === key(e - 1));
+  // programowanie dynamiczne po granicach dni: minimalna suma odchyleń i kar; W = dopuszczalne odchylenie granicy
+  const dpEnds = W => {
+    const layers = [{e: [0], c: [0], b: [null]}];
+    for(let k = 1; k < K; k++){
+      const target = total * k / K;
+      const ce = [], cc = [], cb = [], prevL = layers[k - 1];
+      for(let e = 1; e < G; e++){
+        if(pen[e] === Infinity) continue;
+        const dev = Math.abs(cum[e - 1] - target);
+        if(dev > W) continue;
+        let bc = Infinity, bi = -1;
+        for(let j = 0; j < prevL.e.length; j++){
+          if(!valid(prevL.e[j], e)) continue;
+          if(prevL.c[j] < bc){ bc = prevL.c[j]; bi = j; }
+        }
+        if(bi < 0) continue;
+        ce.push(e); cc.push(bc + dev + pen[e]); cb.push(bi);
+      }
+      if(!ce.length) return null;
+      layers.push({e: ce, c: cc, b: cb});
+    }
+    const last = layers[K - 1];
+    let bc = Infinity, bi = -1;
+    for(let j = 0; j < last.e.length; j++){ if(valid(last.e[j], G) && last.c[j] < bc){ bc = last.c[j]; bi = j; } }
+    if(bi < 0) return null;
+    const ends = [G];
+    for(let k = K - 1; k >= 1; k--){ ends.push(layers[k].e[bi]); bi = layers[k].b[bi]; }
+    return ends.reverse();
+  };
+  let ends = null;
+  for(const wm of [3, 6, 12, 1e9]){ ends = dpEnds(wm * total / K); if(ends) break; }
+  if(!ends){                                         // awaryjnie: najbliżej celu, bez kar
+    ends = []; let prev = 0;
+    for(let k = 1; k < K; k++){
+      const t = total * k / K; let best = prev + 1;
+      for(let e = prev + 1; e <= G - (K - k); e++) if(Math.abs(cum[e - 1] - t) < Math.abs(cum[best - 1] - t)) best = e;
+      ends.push(best); prev = best;
+    }
+    ends.push(G);
+  }
   let s = 0;
   for(let k = 0; k < K; k++){
     for(let i = s; i < ends[k]; i++) days[k].push(...groups[i].u);

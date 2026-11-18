@@ -34,10 +34,6 @@
 
 <div class="layout">
 <aside class="panel">
-  <div class="set-head">
-    <h2>Ustawienia</h2>
-    <button type="button" class="ghost" id="reset">Resetuj</button>
-  </div>
   <div class="warn" id="warn" hidden></div>
 
   <fieldset>
@@ -56,9 +52,9 @@
   </fieldset>
 
   <fieldset>
-    <legend>Gotowe ustawienia</legend>
+    <legend class="presets-lg">Gotowe ustawienia <button type="button" class="pill" id="reset" title="Przywróć ustawienia domyślne"><span aria-hidden="true">↺</span> Resetuj</button></legend>
     <select id="preset">
-      <option value="" selected>Własne</option>
+      <option value="" selected disabled hidden>Wybierz ustawienie…</option>
       <option value="p3_5">3 czytania · 5 dni w tygodniu</option>
       <option value="p3_7">3 czytania · 7 dni w tygodniu</option>
       <option value="p2_5">2 czytania · 5 dni w tygodniu</option>
@@ -91,13 +87,12 @@
       <option value="chron">Chronologicznie</option>
     </select>
     <p class="hint" id="orderHint" hidden></p>
-    <div class="field" id="noMixWrap">
-      <span class="lab">Nie łącz ksiąg w jednym dniu <button type="button" class="qb" data-h="nie_laczy" aria-label="Wyjaśnienie" aria-expanded="false">?</button></span>
-      <select id="noMixMode">
-        <option value="off">Wyłączone</option>
-        <option value="soft" selected>Miękko (gdy się da)</option>
-        <option value="hard">Twardo (zawsze)</option>
-      </select>
+    <div id="noMixWrap">
+      <label class="check"><input type="checkbox" id="noMixOn" checked> Nie łącz ksiąg w jednym dniu <button type="button" class="qb" data-h="nie_laczy" aria-label="Wyjaśnienie" aria-expanded="false">?</button></label>
+      <div class="indent"><select id="noMixMode" aria-label="Tryb: nie łącz ksiąg">
+        <option value="soft" selected>Tryb: miękki</option>
+        <option value="hard">Tryb: twardy</option>
+      </select></div>
     </div>
   </fieldset>
 
@@ -159,14 +154,18 @@
     </div>
     <label class="check"><input type="checkbox" id="mono"> Wydruk czarno-biały</label>
     <div class="field">
-      <span class="lab">Rozdzielnik czytań w CSV</span>
+      <span class="lab">Rozdzielnik (czytania w CSV, księgi w jednym czytaniu)</span>
       <select id="sep">
         <option value=" | " selected>| (kreska pionowa)</option>
         <option value="; ">; (średnik)</option>
         <option value=" / ">/ (ukośnik)</option>
         <option value=" + ">+ (plus)</option>
+        <option value=" · ">· (kropka środkowa)</option>
         <option value="\n">nowa linia w komórce</option>
+        <option value="own">Własny…</option>
       </select>
+      <input type="text" id="sepOwn" class="sep-own" maxlength="5" placeholder="np. ~ albo  ·  " aria-label="Własny rozdzielnik" hidden>
+      <p class="hint warn-text" id="sepErr" hidden></p>
     </div>
     <label class="check"><input type="checkbox" id="csvDate"> Dodaj w CSV kolumnę z datą</label>
   </fieldset>

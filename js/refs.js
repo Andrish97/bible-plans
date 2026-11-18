@@ -1,11 +1,14 @@
 // Formatowanie odnośników biblijnych: zestaw skrótów ksiąg + zapis rozdziału i wersetu.
 
-/** Style zapisu: separator rozdział/werset, łącznik zakresu i separator listy rozdziałów. */
+/**
+ * Style zapisu: cv – rozdział/werset, dash – zakres, vs – lista wersetów w jednym rozdziale,
+ * list – lista całych rozdziałów.
+ */
 export const REF_STYLES = [
-  {id: 'colon',    label: 'Dwukropek',            cv: ':', dash: '-', list: ', '},
-  {id: 'comma',    label: 'Przecinek (polski)',   cv: ',', dash: '-', list: '; '},
-  {id: 'comma-en', label: 'Przecinek i półpauza', cv: ',', dash: '–', list: '; '},
-  {id: 'dot',      label: 'Kropka',               cv: '.', dash: '-', list: ', '},
+  {id: 'colon',    label: 'Dwukropek',                cv: ':', dash: '-', vs: ',', list: ','},
+  {id: 'comma',    label: 'Polski (przecinek)',       cv: ',', dash: '-', vs: '.', list: '; '},
+  {id: 'comma-en', label: 'Polski z półpauzą',        cv: ',', dash: '–', vs: '.', list: '; '},
+  {id: 'dot',      label: 'Kropka',                   cv: '.', dash: '-', vs: ',', list: ','},
 ];
 
 export class RefFormatter {
@@ -18,6 +21,7 @@ export class RefFormatter {
     this.tr = tr;
     this.style = REF_STYLES.find(s => s.id === opts.style) || REF_STYLES[0];
     this.names = new Map(canon.books.map(b => [b.id, b.abbr[opts.abbr] || b.abbr.pl]));
+    this.bookSep = opts.bookSep || '; ';
   }
   book(b){ return this.names.get(b); }
 
@@ -46,11 +50,24 @@ export class RefFormatter {
       }
       runs.push([bk, ch, vs, ch, ve]);
     }
-    // jedna nazwa księgi na dzień: 'Rdz 1, 3' / 'Rdz 11:1-31; 12-14' (przy zapisie z przecinkiem zawsze średnik)
-    const segs = runs.map(r => this.run(r).slice(this.book(bk).length + 1));
-    const whole = seg => !seg.includes(this.style.cv);
-    let out = segs[0];
-    for(let k = 1; k < segs.length; k++) out += (whole(segs[k - 1]) && whole(segs[k]) ? this.style.list : '; ') + segs[k];
+    // jedna nazwa księgi na dzień: 'Ps 23:1,4; 51:3-5,12; 91' / 'Rdz 11,1-31; 12-14' / 'Rdz 1,3'
+    const {cv, dash, vs: VS, list: LS} = this.style;
+    const tok = runs.map(([, c1, v1, c2, v2]) => {
+      const fs = v1 <= tr.firstVerse(bk, c1), fe = v2 >= tr.last(bk, c2);
+      if(c1 !== c2 && fs && fe) return {t: 'w', c: c1, s: `${c1}${dash}${c2}`};
+      if(c1 !== c2) return {t: 'x', e: c2, s: `${c1}${cv}${v1}${dash}${c2}${cv}${v2}`};
+      if(fs && fe) return {t: 'w', c: c1, s: `${c1}`};
+      return {t: 'v', c: c1, s: v1 === v2 ? `${v1}` : `${v1}${dash}${v2}`};
+    });
+    let out = '', prev = null;
+    for(const x of tok){
+      if(!prev) out = x.t === 'v' ? `${x.c}${cv}${x.s}` : x.s;
+      else if(x.t === 'v' && ((prev.t === 'v' && prev.c === x.c) || (prev.t === 'x' && prev.e === x.c))) out += VS + x.s;
+      else if(x.t === 'w' && prev.t === 'w') out += LS + x.s;
+      else if(x.t === 'v') out += `; ${x.c}${cv}${x.s}`;
+      else out += '; ' + x.s;
+      prev = x;
+    }
     return `${this.book(bk)} ${out}`;
   }
 
@@ -62,6 +79,6 @@ export class RefFormatter {
       byBook.get(u[0]).push(u);
     }
     return order.map(b => byBook.get(b).slice().sort((x, y) => x[1] - y[1] || x[2] - y[2]))
-      .map(l => this.bookText(l)).join('; ');
+      .map(l => this.bookText(l)).join(this.bookSep);
   }
 }

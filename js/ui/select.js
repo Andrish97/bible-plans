@@ -26,6 +26,7 @@ function build(sel){
   const sync = () => {
     const o = sel.options[sel.selectedIndex];
     lbl.textContent = o ? o.textContent : '';
+    btn.disabled = sel.disabled;
     list.querySelectorAll('li[data-i]').forEach(li => {
       const opt = sel.options[+li.dataset.i];
       li.setAttribute('aria-selected', String(+li.dataset.i === sel.selectedIndex));

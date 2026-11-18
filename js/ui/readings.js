@@ -7,14 +7,14 @@ import {CONTENT} from '../settings.js';
  * @param {{n:number, cont:string[], own:number[][]}} state
  * @param {object} canon       data/books.json
  * @param {Set<number>} available księgi obecne w przekładzie
- * @param {() => void} onChange
+ * @param {(kind?: 'content') => void} onChange  'content' = zmieniono zestaw ksiąg czytania
  */
 export function renderReadings(host, state, canon, available, onChange){
   host.innerHTML = '';
   const name = b => canon.books[b - 1].name;
   for(let i = 0; i < state.n; i++){
     const books = booksOf(state, i, available);
-    const sel = el('select', {'aria-label': `Zawartość czytania ${i + 1}`, onchange: () => { state.cont[i] = sel.value; onChange(); }},
+    const sel = el('select', {'aria-label': `Zawartość czytania ${i + 1}`, onchange: () => { state.cont[i] = sel.value; onChange('content'); }},
       CONTENT.map(c => el('option', {value: c.id}, c.label)));
     sel.value = state.cont[i];
     const total = state.cont[i] === 'own' ? null : CONTENT.find(c => c.id === state.cont[i]).books().length;

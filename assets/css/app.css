@@ -107,6 +107,18 @@ label.check{display:flex;align-items:center;cursor:pointer;margin-top:8px;font-s
 label.check.off{opacity:.45;cursor:not-allowed}
 label.check.off input{cursor:not-allowed}
 
+legend.presets-lg{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--accent);font:600 11px/1.2 system-ui,sans-serif;text-transform:none;letter-spacing:0}
+.pill:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.pill span{font-size:13px}
+.indent{padding-left:23px;margin-top:6px}
+.sep-own{margin-top:6px;letter-spacing:.1em}
+.sep-own::placeholder{color:var(--muted);letter-spacing:0}
+.warn-text{color:var(--warn)}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.dd-btn:disabled{opacity:.45;cursor:not-allowed}
+
 /* czytania */
 .reading{margin:0 0 8px}
 .reading .rhead{display:flex;align-items:baseline;gap:8px;font-weight:600;color:var(--accent);font-size:12.5px;margin-bottom:3px}

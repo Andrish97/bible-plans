@@ -3,7 +3,7 @@ import {$} from './dom.js';
 import {loadCanon, loadTranslationList, loadTranslation} from './data.js';
 import {buildPlan} from './planner.js';
 import {RefFormatter, REF_STYLES} from './refs.js';
-import {CONTENT, CONTROLS, DEFAULT_READINGS, PRESETS, PRESET_BASE, range, loadSaved, save, clearSaved} from './settings.js';
+import {CONTENT, CONTROLS, DEFAULT_READINGS, PRESETS, PRESET_BASE, PLAN_CHAIN, SEP_OK, range, loadSaved, save, clearSaved} from './settings.js';
 import {enhanceSelects} from './ui/select.js';
 import {initCalendar, parseDate} from './ui/calendar.js';
 import {initTheme} from './ui/theme.js';
@@ -81,10 +81,12 @@ function wire(){
     if(id === 'preset'){ applyPreset(e.target.value); return; }
     if(id === 'translation'){ switchTranslation(); return; }
     if(e.target.closest('#readings')) return;          // czytania obsługuje ui/readings.js
-    if(e.target.closest('#days') || ['nread', 'order', 'noMixMode', 'unit', 'noSplitCh', 'useHeads', 'start', 'ndays'].includes(id)) markCustom();
     if(id === 'nread') S.readings.n = +e.target.value;
+    if(PLAN_CHAIN.includes(id)){ markCustom(); resetBelow(id); }
+    if(e.target.closest('#days') || id === 'start' || id === 'ndays') markCustom();
     update();
   });
+  $('sepOwn').addEventListener('input', schedule);
   $('ndays').addEventListener('input', () => { markCustom(); schedule(); });
   $('ptitle').addEventListener('input', schedule);
   $('fname').addEventListener('change', persist);
@@ -100,11 +102,34 @@ let raf = 0;
 const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(update); };
 const markCustom = () => { if($('preset').value) $('preset').value = ''; };
 
+/** Zmiana ustawienia planu przywraca domyślne wartości ustawień planu, które są pod nim. */
+function resetBelow(id){
+  for(const k of PLAN_CHAIN.slice(PLAN_CHAIN.indexOf(id) + 1)){
+    if(k === 'readings'){
+      const d = structuredClone(DEFAULT_READINGS);
+      S.readings = {...d, n: S.readings.n};
+    } else setVal(k, DEF.get(k));
+  }
+}
+
+/** Rozdzielnik: wybrany z listy albo własny (sprawdzony). */
+function sepCheck(){
+  if(val('sep') !== 'own') return {ok: true, value: val('sep').replace(/\\n/g, '\n')};
+  const v = val('sepOwn');
+  if(!v) return {ok: false, msg: 'Wpisz własny rozdzielnik.'};
+  if(v.length > 5) return {ok: false, msg: 'Rozdzielnik może mieć najwyżej 5 znaków.'};
+  if(!SEP_OK.test(v)) return {ok: false, msg: 'Niedozwolony znak w rozdzielniku. Dozwolone: spacja | ; / + - · • * # ~ _ & ^'};
+  return {ok: true, value: v};
+}
+
 function applyPreset(key){
   const p = PRESETS[key];
   if(!p) return update();
+  const txt = $('preset').selectedOptions[0].textContent;
+  setVal('fname', txt.replace(/\s*·\s*/g, '_').replace(/\s+/g, '_'));
   S.readings.n = p.nread;
   p.readings.forEach((c, i) => { S.readings.cont[i] = c; });
+  S.readings.own = structuredClone(DEFAULT_READINGS.own);
   setVal('nread', String(p.nread));
   setVal('order', p.order);
   for(const [id, v] of Object.entries(PRESET_BASE)) setVal(id, v);
@@ -115,6 +140,7 @@ function applyPreset(key){
 function reset(){
   clearSaved();
   DEF.forEach((v, id) => { if(id !== 'translation') setVal(id, v); });
+  setVal('preset', '');
   setWeekdays(range(0, 6));
   S.readings = structuredClone(DEFAULT_READINGS);
   update();
@@ -165,6 +191,7 @@ function chronAllowed(parts){
 
 function problems(parts){
   const msgs = [];
+  const sc = sepCheck(); if(!sc.ok) msgs.push(sc.msg);
   if(parts.some(p => !p.books.length)) msgs.push('Każde czytanie musi mieć przynajmniej jedną księgę.');
   if(!weekdays().size) msgs.push('Zaznacz przynajmniej jeden dzień tygodnia.');
   const n = parseInt(val('ndays'), 10);
@@ -174,7 +201,7 @@ function problems(parts){
 }
 function showWarn(msgs){ $('warn').textContent = msgs.join(' '); $('warn').hidden = !msgs.length; }
 
-function formatter(){ return new RefFormatter(S.canon, S.tr, {abbr: val('abbr'), style: val('refStyle')}); }
+function formatter(bookSep){ return new RefFormatter(S.canon, S.tr, {abbr: val('abbr'), style: val('refStyle'), bookSep}); }
 
 function refreshControls(parts){
   const tr = S.tr, info = tr.info;
@@ -200,6 +227,12 @@ function refreshControls(parts){
   $('orderHint').hidden = chronOk;
   $('orderHint').textContent = 'Chronologia: jedno czytanie (cała Biblia, Stary albo Nowy Testament) albo dwa (Stary i Nowy Testament).';
   $('noMixWrap').hidden = val('order') !== 'seq';
+  ctrl('noMixMode').disabled = !val('noMixOn');
+  // rozdzielnik
+  const sc = sepCheck();
+  $('sepOwn').hidden = val('sep') !== 'own';
+  $('sepErr').hidden = sc.ok || val('sep') !== 'own';
+  $('sepErr').textContent = sc.ok ? '' : sc.msg;
   // podział i nagłówki
   const byCh = val('unit') === 'chapters';
   ctrl('noSplitCh').disabled = byCh;
@@ -212,7 +245,7 @@ function refreshControls(parts){
   // eksport
   $('templateHint').textContent = TEMPLATES.find(t => t.id === val('template'))?.desc || '';
   // czytania
-  renderReadings($('readings'), S.readings, S.canon, new Set(tr.bookIds), () => { markCustom(); update(); });
+  renderReadings($('readings'), S.readings, S.canon, new Set(tr.bookIds), kind => { markCustom(); if(kind === 'content') resetBelow('readings'); update(); });
 }
 
 // ---------------------------------------------------------------- plan
@@ -235,11 +268,11 @@ function update(){
   const plan = buildPlan({
     tr, parts, dates,
     chron: chron ? tr.chronology.entries : null,
-    mode: val('unit'), mix: val('noMixMode'),
+    mode: val('unit'), mix: val('noMixOn') ? val('noMixMode') : 'off',
     useHeads: tr.hasHeadings && val('useHeads'), noSplitCh: val('noSplitCh'),
     weekdays: weekdays(),
   });
-  const f = formatter();
+  const f = formatter(sepCheck().value);
   const P = parts.length;
   S.view = {
     parts: parts.map(p => p.name),
@@ -268,7 +301,7 @@ function safeName(){
 }
 function exportCsv(){
   if(!S.view || $('dl').disabled) return;
-  download(safeName() + '.csv', toCsv(S.view.rows, {sep: val('sep').replace(/\\n/g, '\n'), withDate: val('csvDate')}));
+  download(safeName() + '.csv', toCsv(S.view.rows, {sep: sepCheck().value, withDate: val('csvDate')}));
 }
 function exportPdf(){
   if(!S.view || $('pdf').disabled) return;

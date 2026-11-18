@@ -14,8 +14,18 @@ export const CONTENT = [
 export function range(a, b){ const r = []; for(let i = a; i <= b; i++) r.push(i); return r; }
 
 /** Kontrolki zapisywane w przeglądarce (id elementu -> rodzaj). */
-export const CONTROLS = ['translation', 'abbr', 'refStyle', 'preset', 'nread', 'order', 'noMixMode', 'unit', 'noSplitCh', 'useHeads',
-  'start', 'ndays', 'template', 'ptitle', 'mono', 'sep', 'csvDate', 'fname'];
+export const CONTROLS = ['translation', 'abbr', 'refStyle', 'preset', 'nread', 'order', 'noMixOn', 'noMixMode', 'unit', 'noSplitCh', 'useHeads',
+  'start', 'ndays', 'template', 'ptitle', 'mono', 'sep', 'sepOwn', 'csvDate', 'fname'];
+
+/**
+ * Łańcuch ustawień planu: zmiana jednego przywraca domyślne wartości wszystkich kolejnych.
+ * Przekład, zapis odnośników, kalendarz i eksport są niezależne (nie są w łańcuchu).
+ * 'readings' oznacza zawartość czytań.
+ */
+export const PLAN_CHAIN = ['nread', 'readings', 'order', 'noMixOn', 'noMixMode', 'unit', 'noSplitCh', 'useHeads'];
+
+/** Własny rozdzielnik: 1–5 znaków, tylko bezpieczne znaki (bez liter, cyfr, cudzysłowu i przecinka). */
+export const SEP_OK = /^[ |\/+\-;·•*#~_&^]+$/;
 
 export const DEFAULT_READINGS = {n: 3, cont: ['otnw', 'wis', 'nt', 'ot'], own: [[], [], [], []]};
 
@@ -30,7 +40,7 @@ export const PRESETS = {
   alls_7: {nread: 1, readings: ['all'],               order: 'seq',   days: [0, 1, 2, 3, 4, 5, 6]},
 };
 /** Wspólne dla wszystkich zestawów. */
-export const PRESET_BASE = {noMixMode: 'soft', unit: 'words', noSplitCh: true, useHeads: true};
+export const PRESET_BASE = {noMixOn: true, noMixMode: 'soft', unit: 'words', noSplitCh: true, useHeads: true};
 
 export function loadSaved(){
   try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; }catch(e){ return null; }
