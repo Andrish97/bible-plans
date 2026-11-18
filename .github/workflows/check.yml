@@ -12,16 +12,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Dane w data/ zgadzają się ze źródłami (konwersja od nowa)
+      - name: W repozytorium nie ma tekstu przekładów
         run: |
-          python3 tools/convert_mybible.py
-          git diff --stat --exit-code -- data/
+          ! git ls-files | grep -E '\.mybible$|^data/translations/[^/]+/text/|^\.cache/'
       - name: Kompletność planów (każdy werset dokładnie raz)
         run: node tools/check.mjs
-      - name: Treściowa weryfikacja granic chronologii
-        run: node tools/verify_boundaries.mjs
       - name: Lista plików offline w service workerze
         run: node tools/check_sw.mjs

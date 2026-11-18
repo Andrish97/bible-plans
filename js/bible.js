@@ -1,17 +1,19 @@
-// Model przekładu zbudowany z plików data/translations/<id>/*.json.
-// Wszystko liczone jest na rzeczywistej budowie wybranego przekładu: liczbie rozdziałów,
-// wersetów (z lukami) i słów. Moduł jest czysty (bez DOM i fetch) – da się go testować w Node.
+// Model przekładu: budowa (data/translations/<id>/structure.json) + mapa numeracji na wzorzec
+// (data/versification/<id>.json). Chronologia i nagłówki są zapisane we wzorcu (numeracja oryginału)
+// i przez mapę trafiają na wersety przekładu. Moduł jest czysty (bez DOM i fetch) – da się go testować w Node.
 
 /** Jednostka planu: [księga, rozdział, werset od, werset do] (wersety w obrębie jednego rozdziału). */
 
 export class Translation {
   /**
-   * @param {object} info      wpis z data/translations.json
-   * @param {object} structure data/translations/<id>/structure.json
-   * @param {object|null} headings data/translations/<id>/headings.json albo null
-   * @param {object} canon     data/books.json
+   * @param {object} info          wpis z data/translations.json
+   * @param {object} structure     data/translations/<id>/structure.json
+   * @param {object} canon         data/books.json
+   * @param {object} org           data/versification/org.json – liczba wersetów w rozdziałach wzorca
+   * @param {object|null} map      data/versification/<id>.json – połączenia różne od 1:1
+   * @param {object|null} headings data/headings/<zestaw>.json – początki sekcji we wzorcu
    */
-  constructor(info, structure, headings, canon){
+  constructor(info, structure, canon, org, map, headings){
     this.info = info;
     this.id = info.id;
     this.canon = canon;
@@ -19,12 +21,45 @@ export class Translation {
     /** @type {Map<number, (number|null)[][]>} */
     this.books = new Map(Object.entries(structure.books).map(([b, ch]) => [+b, ch]));
     this.bookIds = [...this.books.keys()].sort((a, b) => a - b);
+    this.org = org;
+    this.buildMap(map);
     this.headSet = new Set();
-    if(headings) for(const h of headings.headings){
-      const r = this.parseRef(h.ref);
-      if(r && (h.level || 1) === 1) this.headSet.add(`${r.b}.${r.c}.${r.v}`);
+    if(headings) for(const ref of headings.headings){
+      const r = this.parseRef(ref);
+      const own = r && this.fromOrg(r.b, r.c, r.v)[0];
+      if(own) this.headSet.add(own.join('.'));
     }
     this.hasHeadings = this.headSet.size > 0;
+  }
+
+  /** Rozwinięcie zakresu z mapy ('Gen 31:55', 'Gen 32:1-3', 'Gen 31:55-32:1') na wersety; last(b,c) = koniec rozdziału. */
+  keysOf(ref, last){
+    const m = /^(\S+) (\d+):(\d+)(?:-(?:(\d+):)?(\d+))?$/.exec(ref);
+    const b = this.osisToId.get(m[1]), c1 = +m[2], v1 = +m[3];
+    if(!m[5]) return [[b, c1, v1]];
+    const c2 = m[4] ? +m[4] : c1, v2 = +m[5], out = [];
+    for(let c = c1; c <= c2; c++) for(let v = c === c1 ? v1 : 1; v <= (c === c2 ? v2 : last(b, c)); v++) out.push([b, c, v]);
+    return out;
+  }
+
+  /** Mapa wzorzec -> przekład: połączenia n:m, brakujące wersety wzorca; reszta to ten sam numer. */
+  buildMap(map){
+    const orgLast = (b, c) => this.org.books[b]?.[c - 1] || 0;
+    this.orgToOwn = new Map();                  // 'b.c.v' wzorca -> [[b,c,v] przekładu]
+    this.mappedOwn = new Set();                 // wersety przekładu, które są w jakimś połączeniu
+    for(const [o, t] of map?.links || []){
+      const O = this.keysOf(o, orgLast), T = this.keysOf(t, (b, c) => this.last(b, c));
+      for(const k of O) this.orgToOwn.set(k.join('.'), T);
+      for(const k of T) this.mappedOwn.add(k.join('.'));
+    }
+    for(const o of map?.missing || []) for(const k of this.keysOf(o, orgLast)) this.orgToOwn.set(k.join('.'), []);
+  }
+
+  /** Werset wzorca -> wersety przekładu (pusta lista, gdy przekład go nie ma). */
+  fromOrg(b, c, v){
+    const linked = this.orgToOwn.get(`${b}.${c}.${v}`);
+    if(linked) return linked;
+    return this.exists(b, c, v) && !this.mappedOwn.has(`${b}.${c}.${v}`) ? [[b, c, v]] : [];
   }
 
   has(b){ return this.books.has(b); }
@@ -53,124 +88,41 @@ export class Translation {
     return b ? {b, c: +m[2], v: +m[3]} : null;
   }
 
-  /**
-   * Zakres z pliku chronologii -> {b, c1, v1, c2, v2}; v1 = null to początek rozdziału, v2 = null to jego koniec.
-   * Składnia: 'Gen 1', 'Gen 1-3', 'Gen 1:1-5', 'Gen 1:20-2:3', 'Gen 1:20-end', 'Gen 1:20-3:end'.
-   */
-  parseRange(str){
-    const m = /^(\S+) (\d+)(?::(\d+))?(?:-(?:(\d+):)?(\d+|end))?$/.exec(str.trim());
+  /** Zakres z pliku chronologii (numeracja wzorca): 'Gen 1', 'Gen 1-3', 'Gen 1:1-5', 'Gen 1:20-2:3' -> wersety wzorca. */
+  orgRange(str){
+    const m = /^(\S+) (\d+)(?::(\d+))?(?:-(?:(\d+):)?(\d+))?$/.exec(str.trim());
     if(!m) throw new Error('Nieprawidłowy zakres: ' + str);
-    const b = this.osisToId.get(m[1]);
-    const c1 = +m[2];
-    if(m[3] === undefined){                         // całe rozdziały: 'Gen 1' / 'Gen 1-3'
-      return {b, c1, v1: null, c2: m[5] ? +m[5] : c1, v2: null};
-    }
-    const v1 = +m[3];
-    if(m[5] === undefined) return {b, c1, v1, c2: c1, v2: v1};
-    const c2 = m[4] ? +m[4] : c1;
-    return {b, c1, v1, c2, v2: m[5] === 'end' ? null : +m[5]};
+    const b = this.osisToId.get(m[1]), c1 = +m[2];
+    const last = c => this.org.books[b]?.[c - 1] || 0;
+    let v1, c2, v2;
+    if(m[3] === undefined){ v1 = 1; c2 = m[5] ? +m[5] : c1; v2 = last(c2); }
+    else { v1 = +m[3]; c2 = m[4] ? +m[4] : c1; v2 = m[5] ? +m[5] : (m[4] ? last(c2) : v1); }
+    if(m[3] !== undefined && m[5] && !m[4]) c2 = c1;
+    const out = [];
+    for(let c = c1; c <= c2; c++) for(let v = c === c1 ? v1 : 1; v <= (c === c2 ? v2 : last(c)); v++) out.push([b, c, v]);
+    return out;
   }
 
   /**
-   * Przelicznik punktów z wersyfikacji odniesienia (np. BW) na ten przekład, dla jednej księgi.
-   * Rozdziały, po których oba przekłady mają tyle samo wersetów od początku księgi, są punktami zgodności.
-   * Między takimi punktami (i do końca księgi, gdy suma się zgadza) werset liczymy po kolejnym numerze
-   * w księdze – to obsługuje przesunięte granice rozdziałów (Lb 16/17, 1 Krn 5/6, Jl 2/3, Ml 3/4…).
-   * Gdzie sumy się nie zgadzają (np. numeracja tytułów psalmów) zostaje rozdział:werset bez zmian.
-   */
-  pointMapper(b, refChapters, fixes){
-    const ref = refChapters;
-    const own = (this.books.get(b) || []).map(c => c.length);
-    const cum = a => a.reduce((acc, x) => (acc.push((acc.at(-1) || 0) + x), acc), []);
-    const cr = cum(ref), ct = cum(own);
-    const index = new Array(ref.length + 1).fill(false);    // index[c] = rozdział c liczony po numerze w księdze
-    // odcinek między punktami zgodności to przesunięta granica tylko wtedy, gdy różnią się wszystkie jego rozdziały
-    // (np. Lb 16/17); rozdział o tej samej długości w środku odcinka oznacza podział/połączenie wersetu wewnątrz
-    const mark = (from, to) => {
-      for(let k = from; k <= to; k++) if(ref[k - 1] === own[k - 1]) return;
-      for(let k = from; k <= to; k++) index[k] = true;
-    };
-    let start = 1;
-    for(let c = 1; c <= ref.length; c++){
-      if(c <= own.length && cr[c - 1] === ct[c - 1]){ mark(start, c); start = c + 1; }
-    }
-    if(cr.at(-1) === ct.at(-1) && start <= ref.length) mark(start, ref.length);
-    const toOwn = o => {                                     // numer w księdze -> [rozdział, werset]
-      let c = ct.findIndex(x => x >= o) + 1;
-      if(c === 0) c = own.length;
-      return [c, o - (ct[c - 2] || 0)];
-    };
-    return {
-      /** Punkt odniesienia -> punkt przekładu. atEnd = koniec rozdziału; początek za końcem rozdziału = pusty zakres. */
-      map: (c, v, atEnd, isStart) => {
-        if(c > ref.length) return atEnd ? [c, this.last(b, c)] : [c, v];
-        const fix = !index[c] && fixes?.get(c);
-        if(fix && !atEnd){
-          // dopasowanie po treści: werset wzorca -> werset przekładu (najbliższa znana para poniżej/powyżej)
-          // werset 1 bez pewnej pary: początek rozdziału zostaje początkiem rozdziału
-          if(v === 1 && isStart && !fix.some(([rv]) => rv === 1)) return [c, 1];
-          let lo = null, hi = null;
-          for(const [rv, ov] of fix){ if(rv <= v) lo = [rv, ov]; else if(!hi) hi = [rv, ov]; }
-          const p = lo || hi;
-          const w = v + (p[1] - p[0]);
-          // werset przed początkiem rozdziału w przekładzie (jest na końcu poprzedniego): zakres pusty
-          if(w < 1) return isStart ? [c, 1] : [c, 0];
-          return [c, w];
-        }
-        if(index[c]){
-          if(isStart && v > ref[c - 1]) return [Infinity, 0];
-          const vv = atEnd ? ref[c - 1] : Math.min(v, ref[c - 1]);
-          return toOwn((cr[c - 2] || 0) + vv);
-        }
-        return [c, atEnd ? this.last(b, c) : v];
-      },
-    };
-  }
-
-  /**
-   * Dopasowanie uniwersalnej chronologii do wersyfikacji przekładu.
-   * Gwarancja: każdy istniejący werset przekładu trafia do dokładnie jednego pasażu.
-   *  - granice zakresów przeliczane są z wersyfikacji odniesienia (pointMapper),
-   *  - werset zgłoszony dwa razy zostaje w pierwszym pasażu,
-   *  - werset, którego nie objął żaden zakres, dołącza do pasażu poprzedniego wersetu tej samej księgi
-   *    (albo następnego, gdy to początek księgi).
-   * @param {object} chron  data/chronology.json (zakresy + liczba wersetów w rozdziałach numeracji odniesienia)
-   * @param {object} [versification] data/translations/<id>/versification.json – rozdziały z przesuniętą numeracją
+   * Chronologia (numeracja wzorca) -> pasaże w wersetach tego przekładu, przez mapę numeracji.
+   * Gwarancja: każdy istniejący werset przekładu trafia do dokładnie jednego pasażu
+   * (werset połączony z kilkoma wersetami wzorca – do pierwszego z nich; werset bez odpowiednika
+   * we wzorcu – do pasażu poprzedniego wersetu tej samej księgi).
+   * @param {object} chron data/chronology.json
    * @returns {{entries: number[][][], attached: string[], duplicates: number}}
    */
-  mapChronology(chron, versification){
-    const fixes = new Map();                   // księga -> Map(rozdział -> [[werset wzorca, werset przekładu], …])
-    for(const [key, pairs] of Object.entries(versification?.chapters || {})){
-      const [o, c] = key.split(' ');
-      const b = this.osisToId.get(o);
-      if(!fixes.has(b)) fixes.set(b, new Map());
-      fixes.get(b).set(+c, pairs);
-    }
-    const owner = new Map();                   // 'b.c.v' -> indeks pasażu
+  mapChronology(chron){
+    const owner = new Map();                   // 'b.c.v' przekładu -> indeks pasażu
     const lists = chron.entries.map(() => []); // indeks pasażu -> [[b,c,v], ...]
-    const mappers = new Map();
-    const mapper = b => {
-      if(!mappers.has(b)){
-        const refCh = chron.chapters?.[b];
-        mappers.set(b, refCh ? this.pointMapper(b, refCh, fixes.get(b)) : {map: (c, v, atEnd) => [c, atEnd ? this.last(b, c) : v]});
-      }
-      return mappers.get(b);
-    };
     let duplicates = 0;
     chron.entries.forEach((entry, i) => {
       for(const part of entry.split(';')){
-        const r = this.parseRange(part);
-        if(!this.has(r.b)) continue;
-        const m = mapper(r.b);
-        const [sc, sv] = m.map(r.c1, r.v1 || 1, false, true);
-        const [ec, ev] = m.map(r.c2, r.v2 || 0, r.v2 === null);
-        for(let c = sc; c <= ec; c++){
-          const L = this.last(r.b, c);
-          for(let v = c === sc ? sv : 1; v <= (c === ec ? Math.min(ev, L) : L); v++){
-            if(!this.exists(r.b, c, v)) continue;
-            const k = `${r.b}.${c}.${v}`;
-            if(owner.has(k)){ duplicates++; continue; }
-            owner.set(k, i); lists[i].push([r.b, c, v]);
+        for(const [b, c, v] of this.orgRange(part)){
+          if(!this.has(b)) continue;
+          for(const k of this.fromOrg(b, c, v)){
+            const key = k.join('.');
+            if(owner.has(key)){ duplicates++; continue; }
+            owner.set(key, i); lists[i].push(k);
           }
         }
       }

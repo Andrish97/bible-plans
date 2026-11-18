@@ -11,7 +11,7 @@
    "version": "3",
    "books": "all",
    "verses": 31117,
-   "headings": true,
+   "headings": "bw",
    "headingsNote": "nagłówki wydania BW"
   },
   {
@@ -24,7 +24,7 @@
    "version": "2.1",
    "books": "all",
    "verses": 31170,
-   "headings": true,
+   "headings": "snpd",
    "headingsNote": "nagłówki z przekładu dosłownego SNP"
   },
   {
@@ -37,7 +37,7 @@
    "version": "1.1.2",
    "books": "all",
    "verses": 31170,
-   "headings": true,
+   "headings": "snpd",
    "headingsNote": "nagłówki przekładu"
   },
   {
@@ -50,7 +50,7 @@
    "version": "2.0",
    "books": "all",
    "verses": 31102,
-   "headings": false,
+   "headings": null,
    "headingsNote": null
   },
   {
@@ -63,7 +63,7 @@
    "version": "1.0",
    "books": "all",
    "verses": 31162,
-   "headings": false,
+   "headings": null,
    "headingsNote": null
   },
   {
@@ -124,7 +124,7 @@
     66
    ],
    "verses": 14200,
-   "headings": false,
+   "headings": null,
    "headingsNote": null
   }
  ]

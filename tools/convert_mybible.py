@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """Konwersja modułów MySword (*.bbl.mybible, SQLite) do plików JSON używanych przez aplikację.
 
+Do repozytorium trafiają wyłącznie odnośniki i liczby – bez tekstu przekładów (prawa autorskie).
 Dla każdego przekładu powstaje katalog data/translations/<id>/:
 
-  structure.json   – budowa przekładu: księgi, rozdziały, liczba słów w każdym wersecie
-                     (null = werset, którego w tym przekładzie nie ma). Na tym liczony jest plan.
-  headings.json    – początki sekcji (tylko gdy przekład ma nagłówki)
-  text/NN.json     – czysty tekst księgi NN (01–66): wersety, nagłówki, przypisy; bez znaczników MySword
+  structure.json      – budowa przekładu: księgi, rozdziały, liczba słów w każdym wersecie
+                        (null = werset, którego w tym przekładzie nie ma). Na tym liczony jest plan.
 
 oraz wspólny spis data/translations.json.
+
+Lokalnie (.cache/, ignorowane przez git) zapisywany jest czysty tekst i nagłówki modułu w jego numeracji –
+z nich tools/build_versification.py raz buduje mapy numeracji (data/versification/) i nagłówki
+we wzorcu (data/headings/). Moduły źródłowe w sources/mybible/ też nie są w repozytorium.
 
 Użycie:  python3 tools/convert_mybible.py
 """
@@ -23,27 +26,26 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "sources/mybible"
 OUT = ROOT / "data/translations"
+CACHE = ROOT / ".cache/text"
 BOOKS = json.loads((ROOT / "data/books.json").read_text(encoding="utf-8"))["books"]
 OSIS = {b["id"]: b["osis"] for b in BOOKS}
 OSIS_ID = {b["osis"]: b["id"] for b in BOOKS}
 
-# Kolejność na liście w aplikacji. 'headings':
-#   'own'          – nagłówki z samego modułu (o ile ma prawdziwe nagłówki sekcji),
-#   'file:<path>'  – lista granic z pliku (sources/headings/...),
-#   'from:<id>'    – nagłówki pożyczone z innego przekładu o tej samej wersyfikacji.
+# Kolejność na liście w aplikacji. 'headings': który zestaw nagłówków (data/headings/<zestaw>.json,
+# zapisany w numeracji wzorca) ma przekład; None = bez nagłówków.
 TRANSLATIONS = [
     dict(id="bw", glob="PBW_*", short="BW", name="Biblia Warszawska",
-         headings="file:sources/headings/bw.json", headings_note="nagłówki wydania BW"),
+         headings="bw", headings_note="nagłówki wydania BW"),
     dict(id="snp", glob="SNP_SJ*", short="SNP", name="Stare i Nowe Przymierze (EIB)",
-         headings="from:snpd", headings_note="nagłówki z przekładu dosłownego SNP"),
+         headings="snpd", headings_note="nagłówki z przekładu dosłownego SNP"),
     dict(id="snpd", glob="SNPD4_*", short="SNPD", name="Stare i Nowe Przymierze – przekład dosłowny",
-         headings="own", headings_note="nagłówki przekładu"),
-    dict(id="ubg", glob="PUBG_*", short="UBG", name="Uwspółcześniona Biblia Gdańska", headings="own"),
-    dict(id="nbg", glob="PNBG_*", short="NBG", name="Nowa Biblia Gdańska", headings="own"),
-    dict(id="tnp", glob="TNP_*", short="TNP", name="Przekład Toruński (NT i część ST)", headings="own"),
+         headings="snpd", headings_note="nagłówki przekładu"),
+    dict(id="ubg", glob="PUBG_*", short="UBG", name="Uwspółcześniona Biblia Gdańska", headings=None),
+    dict(id="nbg", glob="PNBG_*", short="NBG", name="Nowa Biblia Gdańska", headings=None),
+    dict(id="tnp", glob="TNP_*", short="TNP", name="Przekład Toruński (NT i część ST)", headings=None),
 ]
 
-# Przekład "ma nagłówki", gdy poza Psalmami (tytuły psalmów to nie sekcje) ma ich co najmniej tyle.
+# Moduł "ma nagłówki", gdy poza Psalmami (tytuły psalmów to nie sekcje) ma ich co najmniej tyle.
 MIN_REAL_HEADINGS = 200
 
 TAG = re.compile(r"<[^>]*>")
@@ -152,7 +154,12 @@ def convert(t):
         books.setdefault(b, {}).setdefault(c, {})[v] = (text, heads, notes)
 
     out = OUT / t["id"]
-    (out / "text").mkdir(parents=True, exist_ok=True)
+    (CACHE / t["id"]).mkdir(parents=True, exist_ok=True)
+    import shutil
+    if (out / "text").exists():          # dawny katalog z tekstem w repozytorium
+        shutil.rmtree(out / "text")
+    for old in ("headings.json", "versification.json"):   # zastąpione przez data/headings i data/versification
+        (out / old).unlink(missing_ok=True)
 
     structure, own_heads, nverses = {}, [], 0
     for b in sorted(books):
@@ -179,7 +186,7 @@ def convert(t):
             text_ch.append({"c": c, "verses": verses})
         structure[str(b)] = chapters
         book_json = {"translation": t["id"], "book": b, "osis": OSIS[b], "chapters": text_ch}
-        (out / "text" / f"{b:02d}.json").write_text(json.dumps(book_json, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+        (CACHE / t["id"] / f"{b:02d}.json").write_text(json.dumps(book_json, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
     (out / "structure.json").write_text(
         "{\n" + f' "translation": "{t["id"]}",\n "note": "Liczba słów w każdym wersecie; null = wersetu nie ma w tym przekładzie.",\n "books": {{\n'
@@ -187,191 +194,13 @@ def convert(t):
         + "\n }\n}\n", encoding="utf-8")
 
     real = [h for h in own_heads if h[0] == 1 and h[1] != 19]
+    if len(real) >= MIN_REAL_HEADINGS:   # surowe nagłówki modułu (jego numeracja) – tylko lokalnie
+        hp = ROOT / ".cache/headings" / f"{t['id']}.json"
+        hp.parent.mkdir(parents=True, exist_ok=True)
+        hp.write_text(json.dumps(sorted({ref(b, c, v) for lvl, b, c, v, _ in own_heads if lvl == 1},
+                                        key=lambda r: parse_ref(r))), encoding="utf-8")
     print(f"   {len(structure)} ksiąg, {nverses} wersetów, nagłówki w module: {len(own_heads)} (poza Ps: {len(real)})")
     return dict(t=t, meta=meta, structure=structure, own_heads=own_heads, real=len(real), nverses=nverses, out=out)
-
-
-def verse_exists(structure, b, c, v):
-    ch = structure.get(str(b))
-    return bool(ch) and c <= len(ch) and v <= len(ch[c - 1]) and ch[c - 1][v - 1] is not None
-
-
-def point_mapper(ref, own):
-    """Przelicznik (rozdział, werset) z numeracji odniesienia na numerację przekładu (jak pointMapper w js/bible.js).
-    ref, own: liczba wersetów w kolejnych rozdziałach jednej księgi."""
-    cum = lambda a: [sum(a[:i + 1]) for i in range(len(a))]
-    cr, ct = cum(ref), cum(own)
-    index = [False] * (len(ref) + 1)
-
-    def mark(a, b):  # przesunięta granica tylko, gdy różnią się wszystkie rozdziały odcinka
-        if all(k <= len(own) and ref[k - 1] != own[k - 1] for k in range(a, b + 1)):
-            for k in range(a, b + 1):
-                index[k] = True
-    start = 1
-    for c in range(1, len(ref) + 1):
-        if c <= len(own) and cr[c - 1] == ct[c - 1]:
-            mark(start, c)
-            start = c + 1
-    if ref and own and cr[-1] == ct[-1] and start <= len(ref):
-        mark(start, len(ref))
-
-    def to_own(o):
-        c = next((i + 1 for i, x in enumerate(ct) if x >= o), len(own))
-        return c, o - (ct[c - 2] if c >= 2 else 0)
-
-    def m(c, v):
-        if c <= len(ref) and index[c] and v <= ref[c - 1]:
-            return to_own((cr[c - 2] if c >= 2 else 0) + v)
-        return c, v
-    return m
-
-
-def remap_headings(heads, ref_chapters, structure):
-    """Nagłówki zapisane w innej numeracji -> numeracja przekładu."""
-    out, mappers = [], {}
-    for h in heads:
-        b, c, v = parse_ref(h["ref"])
-        rc = ref_chapters.get(str(b))
-        own = structure.get(str(b))
-        if rc and own:
-            if b not in mappers:
-                mappers[b] = point_mapper(rc, [len(x) for x in own])
-            c, v = mappers[b](c, v)
-        out.append({**h, "ref": f"{OSIS[b]} {c}:{v}"})
-    return out
-
-
-def write_headings(res, all_res):
-    t, structure = res["t"], res["structure"]
-    kind = t["headings"]
-    heads = None
-    if kind == "own":
-        if res["real"] >= MIN_REAL_HEADINGS:
-            heads = [{"ref": ref(b, c, v), "title": h, "level": lvl} for lvl, b, c, v, h in res["own_heads"]]
-    elif kind.startswith("file:"):
-        # lista granic zapisana w numeracji chronologii (data/chronology.json -> chapters)
-        src = json.loads((ROOT / kind[5:]).read_text(encoding="utf-8"))
-        chapters = json.loads((ROOT / "data/chronology.json").read_text(encoding="utf-8"))["chapters"]
-        heads = remap_headings([{"ref": r, "level": 1} for r in src["headings"]], chapters, structure)
-    elif kind.startswith("from:"):
-        other = all_res.get(kind[5:])
-        if other:
-            heads = [{"ref": ref(b, c, v), "title": h, "level": lvl} for lvl, b, c, v, h in other["own_heads"]]
-            chapters = {b: [len(x) for x in ch] for b, ch in other["structure"].items()}
-            heads = remap_headings(heads, chapters, structure)
-    path = res["out"] / "headings.json"
-    if not heads:
-        if path.exists():
-            path.unlink()
-        print(f"   {t['id']}: bez nagłówków")
-        return 0
-    # tylko wersety, które w tym przekładzie istnieją; jeden wpis na werset (pierwszy, najwyższy poziom)
-    seen, kept, dropped = set(), [], 0
-    for h in heads:
-        b, c, v = parse_ref(h["ref"])
-        if not verse_exists(structure, b, c, v):
-            dropped += 1
-            continue
-        if h["ref"] in seen:
-            continue
-        seen.add(h["ref"])
-        kept.append(h)
-    data = {"translation": t["id"], "source": t.get("headings_note"), "headings": kept}
-    body = ",\n".join("  " + json.dumps(h, ensure_ascii=False) for h in kept)
-    head = json.dumps({k: v for k, v in data.items() if k != "headings"}, ensure_ascii=False, indent=1)[:-2]
-    path.write_text(head + ',\n "headings": [\n' + body + "\n ]\n}\n", encoding="utf-8")
-    print(f"   {t['id']}: {len(kept)} nagłówków" + (f" (pominięto {dropped} spoza wersyfikacji)" if dropped else ""))
-    return len(kept)
-
-
-def words_set(t):
-    return {w for w in re.findall(r"\w+", t.lower()) if len(w) >= 4}
-
-
-def similarity(a, b):
-    A, B = words_set(a), words_set(b)
-    return len(A & B) / max(1, len(A | B))
-
-
-def chapter_texts(tid, b, c, cache={}):
-    key = (tid, b)
-    if key not in cache:
-        f = OUT / tid / "text" / f"{b:02d}.json"
-        cache[key] = json.loads(f.read_text(encoding="utf-8")) if f.exists() else None
-    d = cache[key]
-    if not d or c > len(d["chapters"]):
-        return {}
-    return {x["v"]: x["t"] for x in d["chapters"][c - 1]["verses"]}
-
-
-def align(pv, tv, gap=-0.02, min_sim=0.2):
-    """Dopasowanie wersetów rozdziału z zachowaniem kolejności (Needleman–Wunsch na podobieństwie słów).
-    pv, tv: {numer: tekst}. Zwraca {werset wzorca: werset przekładu} dla pewnych par."""
-    a, b = sorted(pv), sorted(tv)
-    n, m = len(a), len(b)
-    S = [[0.0] * (m + 1) for _ in range(n + 1)]
-    B = [[0] * (m + 1) for _ in range(n + 1)]
-    for i in range(1, n + 1):
-        S[i][0], B[i][0] = S[i - 1][0] + gap, 1
-    for j in range(1, m + 1):
-        S[0][j], B[0][j] = S[0][j - 1] + gap, 2
-    sim = {}
-    for i in range(1, n + 1):
-        for j in range(1, m + 1):
-            x = similarity(pv[a[i - 1]], tv[b[j - 1]]) if abs(a[i - 1] - b[j - 1]) <= 6 else -1
-            sim[i, j] = x
-            S[i][j], B[i][j] = max((S[i - 1][j - 1] + x, 0), (S[i - 1][j] + gap, 1), (S[i][j - 1] + gap, 2))
-    pairs, i, j = {}, n, m
-    while i and j:
-        if B[i][j] == 0:
-            if sim[i, j] >= min_sim:
-                pairs[a[i - 1]] = b[j - 1]
-            i, j = i - 1, j - 1
-        elif B[i][j] == 1:
-            i -= 1
-        else:
-            j -= 1
-    return pairs
-
-
-def write_versification(res, all_res, chron_chapters):
-    """Poprawki numeracji względem numeracji chronologii, wykryte po treści.
-
-    Dotyczy rozdziałów, w których liczba wersetów różni się od odniesienia. Wersety rozdziału dopasowujemy
-    z zachowaniem kolejności do wzorca – innego przekładu, który w tym rozdziale ma numerację zgodną
-    z odniesieniem. Zapisujemy tylko pewne pary, w których numer się różni. Aplikacja używa ich tam,
-    gdzie nie da się przeliczyć wersetów po kolejnym numerze w księdze.
-    """
-    t, structure = res["t"], res["structure"]
-    fixes = {}
-    for b_str, chapters in structure.items():
-        b = int(b_str)
-        ref = chron_chapters.get(b_str)
-        if not ref:
-            continue
-        own = [len(x) for x in chapters]
-        for c in range(1, min(len(ref), len(own)) + 1):
-            if ref[c - 1] == own[c - 1]:
-                continue
-            pivot = next((o for o in all_res.values() if o["t"]["id"] != t["id"]
-                          and len(o["structure"].get(b_str, [])) >= c
-                          and len(o["structure"][b_str][c - 1]) == ref[c - 1]), None)
-            if not pivot:
-                continue
-            pv, tv = chapter_texts(pivot["t"]["id"], b, c), chapter_texts(t["id"], b, c)
-            pairs = align(pv, tv)
-            if any(v != w for v, w in pairs.items()):
-                fixes[f"{OSIS[b]} {c}"] = sorted(pairs.items())
-    path = res["out"] / "versification.json"
-    data = {"translation": t["id"],
-            "note": "Rozdziały, w których numeracja tego przekładu jest przesunięta względem numeracji chronologii: "
-                    "pary [werset w numeracji chronologii, werset w tym przekładzie], dopasowane automatycznie po treści.",
-            "chapters": fixes}
-    body = ",\n".join(f'  "{k}": ' + json.dumps(v, separators=(",", ":")) for k, v in fixes.items())
-    head = json.dumps({k: v for k, v in data.items() if k != "chapters"}, ensure_ascii=False, indent=1)[:-2]
-    path.write_text(head + ',\n "chapters": {\n' + body + "\n }\n}\n", encoding="utf-8")
-    print(f"   {t['id']}: {len(fixes)} rozdziałów z przesuniętą numeracją")
-    return len(fixes)
 
 
 def main():
@@ -380,12 +209,8 @@ def main():
         r = convert(t)
         if r:
             results[t["id"]] = r
-    chron_chapters = json.loads((ROOT / "data/chronology.json").read_text(encoding="utf-8"))["chapters"]
-    for r in results.values():
-        write_versification(r, results, chron_chapters)
     index = []
     for tid, r in results.items():
-        n = write_headings(r, results)
         t, m = r["t"], r["meta"]
         books = sorted(int(b) for b in r["structure"])
         index.append({
@@ -394,12 +219,13 @@ def main():
             "publisher": m["publisher"], "source": m["source"], "version": m["version"],
             "books": books if len(books) < 66 else "all",
             "verses": r["nverses"],
-            "headings": n > 0,
-            "headingsNote": t.get("headings_note") if n else None,
+            "headings": t["headings"],
+            "headingsNote": t.get("headings_note") if t["headings"] else None,
         })
     (ROOT / "data/translations.json").write_text(
         json.dumps({"default": "bw", "translations": index}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"spis: data/translations.json ({len(index)} przekładów)")
+    print("dalej: python3 tools/build_versification.py (mapy numeracji i nagłówki we wzorcu)")
 
 
 if __name__ == "__main__":

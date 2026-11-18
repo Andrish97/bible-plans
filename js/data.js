@@ -19,19 +19,20 @@ export const loadTranslationList = () => getJson('data/translations.json');
 export const loadChronology = () => getJson('data/chronology.json');
 
 const models = new Map();
-/** Model przekładu (budowa + nagłówki) i chronologia dopasowana do jego wersyfikacji. */
+/** Model przekładu (budowa + mapa numeracji + nagłówki) i chronologia przeniesiona na jego wersety. */
 export async function loadTranslation(info){
   if(!models.has(info.id)){
     models.set(info.id, (async () => {
-      const [canon, structure, headings, chron, versification] = await Promise.all([
+      const [canon, structure, org, map, headings, chron] = await Promise.all([
         loadCanon(),
         getJson(`data/translations/${info.id}/structure.json`),
-        info.headings ? getJson(`data/translations/${info.id}/headings.json`, true) : null,
+        getJson('data/versification/org.json'),
+        getJson(`data/versification/${info.id}.json`, true),
+        info.headings ? getJson(`data/headings/${info.headings}.json`, true) : null,
         loadChronology(),
-        getJson(`data/translations/${info.id}/versification.json`, true),
       ]);
-      const tr = new Translation(info, structure, headings, canon);
-      tr.chronology = tr.mapChronology(chron, versification);
+      const tr = new Translation(info, structure, canon, org, map, headings);
+      tr.chronology = tr.mapChronology(chron);
       return tr;
     })());
   }

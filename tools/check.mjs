@@ -15,13 +15,30 @@ const {translations} = json('data/translations.json');
 const days = n => Array.from({length: n}, (_, i) => new Date(2027, 0, 1 + i));
 let failed = 0;
 
+const org = json('data/versification/org.json');
 for(const info of translations){
-  const hp = `data/translations/${info.id}/headings.json`;
-  const tr = new Translation(info, json(`data/translations/${info.id}/structure.json`), existsSync(new URL(hp, root)) ? json(hp) : null, canon);
+  const opt = p => existsSync(new URL(p, root)) ? json(p) : null;
+  const map = opt(`data/versification/${info.id}.json`);
+  const tr = new Translation(info, json(`data/translations/${info.id}/structure.json`), canon, org, map,
+    info.headings ? opt(`data/headings/${info.headings}.json`) : null);
+  // mapa: każdy werset przekładu w co najwyżej jednym połączeniu, każdy werset wzorca najwyżej raz
+  if(map){
+    const seenO = new Map(), seenT = new Map();
+    const orgLast = (b, c) => org.books[b]?.[c - 1] || 0;
+    for(const [o, t] of map.links){
+      for(const k of tr.keysOf(o, orgLast)) seenO.set(k.join('.'), (seenO.get(k.join('.')) || 0) + 1);
+      for(const k of tr.keysOf(t, (b, c) => tr.last(b, c))){
+        if(!tr.exists(...k)){ console.error(`   BŁĄD mapy ${info.id}: ${t} – brak wersetu ${k}`); failed++; }
+        seenT.set(k.join('.'), (seenT.get(k.join('.')) || 0) + 1);
+      }
+    }
+    for(const o of map.missing) for(const k of tr.keysOf(o, orgLast)) seenO.set(k.join('.'), (seenO.get(k.join('.')) || 0) + 1);
+    const dupO = [...seenO].filter(([, n]) => n > 1), dupT = [...seenT].filter(([, n]) => n > 1);
+    if(dupO.length || dupT.length){ console.error(`   BŁĄD mapy ${info.id}: wzorzec dwa razy ${dupO.slice(0, 3)}, przekład dwa razy ${dupT.slice(0, 3)}`); failed++; }
+  }
   const all = [];
   for(const b of tr.bookIds) for(let c = 1; c <= tr.chapters(b); c++) for(let v = 1; v <= tr.last(b, c); v++) if(tr.exists(b, c, v)) all.push(`${b}.${c}.${v}`);
-  const vp = `data/translations/${info.id}/versification.json`;
-  const mapped = tr.mapChronology(chron, existsSync(new URL(vp, root)) ? json(vp) : null);
+  const mapped = tr.mapChronology(chron);
   console.log(`${info.id}: ${all.length} wersetów, chronologia: ${mapped.entries.length} pasaży, dołączono ${mapped.attached.length}, duplikaty ${mapped.duplicates}, nagłówki ${tr.headSet.size}`);
 
   const cases = [

@@ -1,0 +1,4 @@
+# lokalny tekst przekładów i moduły źródłowe – nie publikujemy (prawa autorskie)
+.cache/
+sources/mybible/*.mybible
+__pycache__/

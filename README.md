@@ -18,96 +18,96 @@ python3 -m http.server 8000   # potem http://localhost:8000
 
 ```
 index.html                 układ strony (bez logiki i danych)
-assets/
-  css/app.css              wygląd, motywy (systemowy, jasny, ciemny, sepia, wysoki kontrast)
-  css/print.css            szablony wydruku / PDF
-  favicon.svg, apple-touch-icon.png
+assets/                    style (app.css, print.css), ikony
 js/
   main.js                  start aplikacji, ustawienia ↔ plan ↔ podgląd ↔ eksport
   data.js                  wczytywanie plików z data/ (z pamięcią podręczną)
-  bible.js                 model przekładu: wersety, słowa, nagłówki, dopasowanie chronologii
+  bible.js                 model przekładu: wersety, słowa, mapa numeracji, nagłówki, chronologia
   planner.js               podział ksiąg na dni (czysta logika, bez DOM)
   refs.js                  zapis odnośników (zestawy skrótów, rozdział:werset / rozdział,werset)
-  settings.js              wartości domyślne, gotowe zestawy, zapamiętywanie w przeglądarce
-  dom.js                   pomocniki DOM
-  ui/                      listy rozwijane, kalendarz, motyw, pomoc „?”, czytania, podgląd
-  export/                  csv.js, print.js (szablony PDF)
-data/                      dane używane przez aplikację (generowane, patrz niżej)
-sources/
-  mybible/                 źródłowe moduły MySword (*.bbl.mybible, SQLite)
-  headings/bw.json         granice nagłówków Biblii Warszawskiej
-tools/                     skrypty konwersji i test kompletności
+  settings.js, share.js    ustawienia, gotowe zestawy, link do planu
+  ui/, export/             interfejs; eksport CSV, PDF, kalendarz (.ics)
+data/                      dane aplikacji – same odnośniki i liczby, bez tekstu przekładów
+sources/versification/     numeracja wzorca i angielska (org.vrs, eng.vrs – SIL libpalaso, licencja MIT)
+tools/                     konwersja modułów, budowa map, testy
+sw.js, manifest.webmanifest  działanie bez internetu, instalacja
 ```
+
+W repozytorium **nie ma tekstu Biblii**. Aplikacja potrzebuje tylko numerów wersetów, liczby słów
+i pozycji nagłówków. Moduły źródłowe (`sources/mybible/*.mybible`) i wyciągnięty z nich tekst (`.cache/`)
+są tylko lokalnie i ignorowane przez git.
 
 ## Dane (`data/`)
 
 | Plik | Zawartość |
 |---|---|
 | `books.json` | 66 ksiąg: id 1–66, kod OSIS, nazwa, zestawy skrótów (`pl` ekumeniczne, `bw` Biblii Warszawskiej, `name` pełne nazwy, `en` SBL, `osis`), grupy ksiąg |
-| `translations.json` | spis przekładów: skrót, nazwa, zakres ksiąg, liczba wersetów, czy ma nagłówki |
+| `translations.json` | spis przekładów: skrót, nazwa, zakres ksiąg, liczba wersetów, zestaw nagłówków |
 | `translations/<id>/structure.json` | budowa przekładu: liczba słów w każdym wersecie (`null` = wersetu nie ma). Na tym liczony jest plan |
-| `translations/<id>/headings.json` | początki sekcji (tylko przekłady z nagłówkami) |
-| `translations/<id>/versification.json` | rozdziały, w których numeracja przekładu jest przesunięta względem chronologii: pary wersetów dopasowane automatycznie po treści |
-| `translations/<id>/text/NN.json` | czysty tekst księgi NN: `{c, verses: [{v, t, h?, n?}]}`; `t` tekst (wiersze poezji rozdzielone `\n`), `h` nagłówki przed wersetem, `n` przypisy `{m: znacznik, t: treść}` |
-| `chronology.json` | uniwersalna kolejność chronologiczna (1749 pasaży) + liczba wersetów w rozdziałach numeracji, w której ją zapisano |
+| `versification/org.json` | **wzorzec**: numeracja oryginału (Biblia Hebrajska dla ST, wydania greckie dla NT) – liczba wersetów w rozdziałach |
+| `versification/<id>.json` | **mapa** numeracji przekładu na wzorzec |
+| `chronology.json` | uniwersalna kolejność chronologiczna (1749 pasaży) w numeracji wzorca |
+| `headings/<zestaw>.json` | początki sekcji w numeracji wzorca (bez tytułów): `bw` (wydanie BW), `snpd` (SNP dosłowny) |
 
-Zapis zakresów w chronologii i nagłówkach: kod OSIS + `rozdział[:werset][-[rozdział:]werset|end]`,
-np. `Gen 1`, `Gen 1-3`, `1Chr 1:1-4`, `Gen 1:20-2:3`, `Gen 1:20-end`.
+### Mapa numeracji
+
+Każdy przekład ma jedną stałą mapę na wzorzec – jak w programach do dopasowywania tłumaczeń:
+
+```jsonc
+"links": [
+  ["Gen 32:1", "Gen 31:55"],                  // przesunięcie przez granicę rozdziału
+  ["Deut 5:17-20", "Deut 5:17"],              // 4 wersety wzorca = 1 werset NBG
+  ["Isa 63:19", "Isa 63:19-64:1"],            // 1 werset wzorca = 2 wersety przekładu
+  ["Ps 108:14", "Ps 109:1"]                   // werset w innym miejscu
+],
+"missing": ["Acts 24:7"],                     // wersety wzorca, których przekład nie ma
+"extra":   ["Neh 7:68"]                       // wersety przekładu bez odpowiednika we wzorcu
+```
+
+Wszystko, czego w mapie nie ma, to ten sam numer we wzorcu i w przekładzie. Chronologia i nagłówki są zapisane
+raz, we wzorcu, a aplikacja przenosi je na wybrany przekład wyłącznie przez mapę – bez zgadywania.
+`node tools/check.mjs` sprawdza spójność map (żaden werset dwa razy, wszystkie istnieją) i to, że plan zawiera
+każdy werset przekładu dokładnie raz.
+
+Mapy zbudowano raz (`tools/build_versification.py`): znane połączenia numeracji angielskiej z oryginałem
+(`eng.vrs`), dopasowanie każdego przekładu po treści do wzorca, a wszystkie miejsca niezgodne z `eng.vrs`
+przeczytane i rozstrzygnięte ręcznie (`MANUAL` w tym pliku).
 
 ### Przekłady
 
-| id | Przekład | Księgi | Nagłówki |
-|---|---|---|---|
-| `bw` | Biblia Warszawska | 66 | tak – nagłówki wydania BW (`sources/headings/bw.json`) |
-| `snp` | Stare i Nowe Przymierze (EIB) | 66 | tak – z przekładu dosłownego SNP |
-| `snpd` | SNP – przekład dosłowny | 66 | tak – własne (≈2700) |
-| `ubg` | Uwspółcześniona Biblia Gdańska | 66 | nie (tylko tytuły psalmów) |
-| `nbg` | Nowa Biblia Gdańska | 66 | nie |
-| `tnp` | Przekład Toruński | 47 (NT, mądrościowe, Megilot, prorocy mniejsi) | nie (tylko tytuły psalmów) |
+| id | Przekład | Księgi | Nagłówki | Numeracja |
+|---|---|---|---|---|
+| `bw` | Biblia Warszawska | 66 | tak – wydanie BW | mieszana (angielska + hebrajska), braki modułu – patrz niżej |
+| `snp` | Stare i Nowe Przymierze (EIB) | 66 | tak – z SNP dosłownego | wzorzec, w 8 księgach angielska |
+| `snpd` | SNP – przekład dosłowny | 66 | tak – własne | wzorzec, w 8 księgach angielska |
+| `ubg` | Uwspółcześniona Biblia Gdańska | 66 | nie | angielska |
+| `nbg` | Nowa Biblia Gdańska | 66 | nie | mieszana, kilka połączonych/podzielonych wersetów |
+| `tnp` | Przekład Toruński | 47 (NT, mądrościowe, Megilot, prorocy mniejsi) | nie | angielska |
 
-Opcja „Zaczynaj dzień od nagłówka sekcji” jest dostępna tylko w przekładach z nagłówkami. Konwerter sam
-wykrywa nagłówki w module (`<TS>` poza Psalmami), więc moduł z nagłówkami dla innego przekładu wystarczy
-wrzucić do `sources/mybible/` i dopisać w `TRANSLATIONS` w `tools/convert_mybible.py`.
-
-### Różnice wersyfikacji a chronologia
-
-Przekłady różnią się numeracją (np. Lb 16/17, 1 Krn 5/6, Jl 2/3, Ml 3/4, tytuły psalmów). Chronologia jest
-zapisana raz, w jednej numeracji, a aplikacja przelicza ją na wybrany przekład (`Translation.mapChronology`):
-
-1. **Przesunięta granica rozdziału** (np. Lb 16/17, 1 Krn 5/6, Ml 3/4): gdy w odcinku między punktami, w których
-   oba przekłady mają tyle samo wersetów od początku księgi, różnią się wszystkie rozdziały, werset liczony jest
-   po kolejnym numerze w księdze.
-2. **Przesunięcie wewnątrz rozdziału** (werset podzielony albo połączony, tytuł psalmu jako werset, np. NBG Pwt 5,
-   gdzie cztery przykazania są w jednym wersecie): konwerter dopasowuje wersety rozdziału po treści do przekładu
-   o numeracji zgodnej z chronologią (dopasowanie z zachowaniem kolejności) i zapisuje pary w `versification.json`.
-3. W pozostałych miejscach zostaje rozdział:werset bez zmian.
-4. Werset, którego nie objął żaden zakres, dołącza do pasażu poprzedniego wersetu tej samej księgi;
-   powtórzony zostaje w pierwszym.
-
-`node tools/check.mjs` sprawdza dla każdego przekładu i kilku ustawień, że plan zawiera każdy werset
-dokładnie raz. `node tools/verify_boundaries.mjs` sprawdza po treści każdą granicę pasażu w środku rozdziału
-(ok. 3100 granic we wszystkich przekładach; obecnie 0 podejrzanych).
+Opcja „Zaczynaj dzień od nagłówka sekcji” jest dostępna tylko w przekładach z nagłówkami.
 
 ### Uwagi o modułach źródłowych
 
-- **BW**: moduł nie zawiera części wersetów numeracji hebrajskiej (m.in. Lb 17:14-28, Lb 30:17, 1 Krn 5:27-41,
-  1 Krn 12:41, 2 Krn 1:18, Ez 21:33-37), a w ich miejscu ma zaślepki `- - -`. Zaślepki są pomijane. Odnośniki w planie
-  pozostają poprawne (np. „Lb 17” to cały rozdział), tylko liczba słów w tych dniach jest nieco zaniżona.
+- **BW**: moduł nie ma 44 wersetów wzorca (m.in. Lb 17:14-28, Pwt 28:69, 1 Krn 5:27-41, Ez 21:33-37, Pnp 7:14),
+  w ich miejscu ma zaślepki `- - -`. W mapie są jako `missing`. Odnośniki w planie pozostają poprawne
+  (np. „Lb 17” to cały rozdział), tylko liczba słów w tych dniach jest nieco zaniżona.
 - **SNPD**: wiersz bez numeru w 2 Krl 15 to duplikat wersetu 27 – usuwany przy konwersji.
 - **SNP**: brak Dz 24:7 (tak jest w przekładzie).
-- **NBG**: werset 109:1 w Psalmach to treściowo zakończenie Ps 108 – w chronologii trafia do Ps 108.
+- **NBG**: Ps 109:1 to treściowo Ps 108:14; Pwt 5:17 obejmuje cztery przykazania (wzorzec 5:17-20).
 
 ## Narzędzia
 
 ```sh
-python3 tools/convert_mybible.py        # sources/mybible/*.mybible -> data/translations/
-node tools/check.mjs                    # test kompletności planów
-node tools/verify_boundaries.mjs        # weryfikacja treściowa granic chronologii
-node tools/check_sw.mjs                 # czy sw.js zapisuje offline wszystkie pliki aplikacji
-python3 tools/extract_legacy.py OLD.html  # jednorazowo: chronologia i nagłówki BW z dawnego index.html
+node tools/check.mjs                      # spójność map i kompletność planów
+node tools/check_sw.mjs                   # czy sw.js zapisuje offline wszystkie pliki aplikacji
+
+# tylko przy nowym albo poprawionym module (wymaga sources/mybible/*.mybible lokalnie):
+python3 tools/convert_mybible.py          # moduły -> data/translations/ (+ tekst lokalnie w .cache/)
+python3 tools/build_versification.py      # mapy -> data/versification/, nagłówki -> data/headings/;
+                                          # raport do przeczytania: .cache/versification_report.txt
 ```
 
-Te same testy uruchamia GitHub Actions (`.github/workflows/check.yml`) przy każdym wypchnięciu zmian, razem
-z ponowną konwersją modułów i sprawdzeniem, czy `data/` zgadza się ze źródłami.
+Testy (`check.mjs`, `check_sw.mjs` i kontrolę, że w repozytorium nie ma tekstu) uruchamia GitHub Actions
+(`.github/workflows/check.yml`) przy każdym wypchnięciu zmian.
 
 Po zmianie listy plików aplikacji dopisz je do `SHELL` w `sw.js` i podnieś `VERSION`.

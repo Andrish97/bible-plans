@@ -5,7 +5,7 @@ const root = new URL('../', import.meta.url).pathname;
 const sw = readFileSync(root + 'sw.js', 'utf8');
 const listed = new Set([...sw.matchAll(/'([^']+\.(?:js|css|png|svg|json|html|webmanifest))'/g)].map(m => m[1]));
 const walk = d => readdirSync(root + d, {withFileTypes: true}).flatMap(e => e.isDirectory() ? walk(`${d}/${e.name}`) : [`${d}/${e.name}`]);
-const need = [...walk('js'), ...walk('assets/css'), 'index.html', 'manifest.webmanifest'];
+const need = [...walk('js'), ...walk('assets/css'), ...walk('data/headings'), 'data/versification/org.json', 'index.html', 'manifest.webmanifest'];
 const translations = JSON.parse(readFileSync(root + 'data/translations.json', 'utf8')).translations.map(t => t.id);
 const ids = (sw.match(/const TRANSLATIONS = \[([^\]]*)\]/) || [, ''])[1].match(/'(\w+)'/g)?.map(x => x.slice(1, -1)) || [];
 const missing = need.filter(f => !listed.has(f));
