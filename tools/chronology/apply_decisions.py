@@ -32,6 +32,18 @@ for src,dst in D.get('move',[]):
     last=tuple(st['parts'][-1]['ks'][-1])
     before = last[0]==dk[0] and last[1]==dk[1] and last[2]+1==dk[2]
     tgt['parts'][pos if before else pos+1:pos if before else pos+1]=st['parts']; tgt['why'].append('ręcznie: przeniesione do swojej historii')
+# 4) psalmy i fragmenty ustawione według treści (moja decyzja, nie Tyndale)
+for src,dst,why in D.get('place',[]):
+    om=owner_map(); i=om[key(src)]
+    if len(S[i]['parts'])!=1: errors.append(f'place: {src} nie jest osobną historią'); continue
+    st=S.pop(i); st['why']=st['why']+['ręcznie (nie Tyndale): '+why]; st['moved']=True
+    om=owner_map(); j=om[key(dst)]; S.insert(j+1,st)
+for src,dst,why in D.get('move_part',[]):
+    om=owner_map(); i=om[key(src)]; st=S[i]
+    pi=next(n for n,p in enumerate(st['parts']) if tuple(p['ks'][0])==key(src)); part=st['parts'].pop(pi)
+    om=owner_map(); j=om[key(dst)]; t=S[j]
+    pj=next(n for n,p in enumerate(t['parts']) if key(dst) in [tuple(x) for x in p['ks']])
+    t['parts'].insert(pj+1,part); t['why'].append('ręcznie (nie Tyndale): '+why)
 om=owner_map(); threads=[]
 for r,name in D['threads']:
     i=om[key(r)]

@@ -586,18 +586,6 @@
    "Psalmy Dawida i Etana (Ps 144–145, 88–89)"
   ],
   [
-   "Ps 50:1",
-   "Psalmy Asafa (Ps 50, 73–74)"
-  ],
-  [
-   "Ps 75:1",
-   "Psalmy Asafa (Ps 75–78)"
-  ],
-  [
-   "Ps 79:1",
-   "Psalmy Asafa (Ps 79–83)"
-  ],
-  [
    "1Chr 29:23",
    "(część 3) Początek panowania Salomona"
   ]
@@ -623,6 +611,95 @@
   [
    "1Chr 12:23",
    "1Chr 12:24"
+  ]
+ ],
+ "place": [
+  [
+   "Ps 50:1",
+   "1Chr 16:37",
+   "Asaf: Asaf wyznaczony przez Dawida do służby przy skrzyni (1 Krn 16,4–7.37); psalm o Bogu na Syjonie, liturgii i ofierze (Ps 50: Bóg z Syjonu, ofiara dziękczynna)."
+  ],
+  [
+   "Ps 78:1",
+   "Ps 50:23",
+   "Asaf: Asaf wyznaczony przez Dawida do służby przy skrzyni (1 Krn 16,4–7.37); psalm o Bogu na Syjonie, liturgii i ofierze (Ps 78 kończy się wyborem Syjonu i Dawida, 78,68–72)."
+  ],
+  [
+   "Ps 81:1",
+   "Ps 78:72",
+   "Asaf: Asaf wyznaczony przez Dawida do służby przy skrzyni (1 Krn 16,4–7.37); psalm o Bogu na Syjonie, liturgii i ofierze (Ps 81: święto, róg, ustawa dla Józefa)."
+  ],
+  [
+   "Ps 73:1",
+   "1Chr 25:1",
+   "Asaf: synowie Asafa wśród śpiewaków świątynnych (1 Krn 25,1–2); psalm mądrościowy bez konkretnego wydarzenia."
+  ],
+  [
+   "Ps 75:1",
+   "Ps 73:28",
+   "Asaf: śpiewacy świątynni (1 Krn 25,1–2); psalm bez konkretnego wydarzenia."
+  ],
+  [
+   "Ps 77:1",
+   "Ps 75:11",
+   "Asaf: śpiewacy świątynni (1 Krn 25,1–2); psalm bez konkretnego wydarzenia."
+  ],
+  [
+   "Ps 82:1",
+   "Ps 77:21",
+   "Asaf: śpiewacy świątynni (1 Krn 25,1–2); psalm bez konkretnego wydarzenia."
+  ],
+  [
+   "Ps 83:1",
+   "2Chr 20:30",
+   "Asaf: Jachazjel, potomek Asafa, prorokuje przed bitwą (2 Krn 20,14); w psalmie koalicja Moabu, Ammonu, Edomu (83,7–9) – ta sama co w 2 Krn 20,1–2.10."
+  ],
+  [
+   "Ps 46:1",
+   "Ps 83:19",
+   "Korachici: chwalą Boga przed bitwą (2 Krn 20,19); psalm o Bogu, który kończy wojny i obronił swoje miasto (46,6–10)."
+  ],
+  [
+   "Ps 47:1",
+   "Ps 46:12",
+   "Korachici (2 Krn 20,19); Bóg królem nad narodami."
+  ],
+  [
+   "Ps 48:1",
+   "Ps 47:10",
+   "Korachici (2 Krn 20,19); królowie zebrani pod Syjonem uciekają (48,5–8), wiatr rozbija okręty z Tarszisz – jak okręty Jehoszafata (2 Krn 20,36–37)."
+  ],
+  [
+   "Ps 80:1",
+   "2Kgs 17:23",
+   "Asaf: modlitwa za Efraima, Beniamina i Manassesa (80,3) – plemiona północne; po upadku Samarii."
+  ],
+  [
+   "Ps 76:1",
+   "2Kgs 19:35",
+   "Asaf: Bóg w Salemie łamie łuki i tarcze, wojownicy zasypiają (76,4–7) – klęska wojska Sennacheryba (2 Krl 19,35)."
+  ],
+  [
+   "Ps 74:1",
+   "Lam 5:22",
+   "Asaf: wrogowie spalili świątynię (74,3–8) – po zburzeniu Jerozolimy (2 Krl 25,9)."
+  ],
+  [
+   "Ps 79:1",
+   "Ps 74:23",
+   "Asaf: Jerozolima w gruzach, świątynia skalana (79,1–3) – po zburzeniu Jerozolimy."
+  ],
+  [
+   "Ps 85:1",
+   "Ezra 3:13",
+   "Korachici: „odmieniłeś los Jakuba” (85,2) – po powrocie z wygnania."
+  ]
+ ],
+ "move_part": [
+  [
+   "Luke 22:63",
+   "Luke 22:62",
+   "Łk 22,63–65 (żołnierze szydzą z Jezusa w nocy) – w walkthru omyłkowo przy szyderstwach żołnierzy Piłata; trzy pozostałe wydania Tyndale mają je w nocy, obok Mk 14,65 / Mt 26,67–68, a u Łukasza to ciąg dalszy 22,54–62."
   ]
  ]
 }
