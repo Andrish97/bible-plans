@@ -1,0 +1,65 @@
+/* Szablony wydruku / PDF. Rozmiar strony (@page) ustawia js/export/print.js dla każdego szablonu. */
+@media print{
+  #printRoot{font-family:Georgia,"Times New Roman",serif;color:#000;--pc:#7a2e1d;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #printRoot.mono{--pc:#000}
+  #printRoot .p-title{font-size:15pt;color:var(--pc);text-align:center;margin:0}
+  #printRoot .p-sub{font-size:8.5pt;color:#555;text-align:center;margin:1mm 0 3mm}
+  #printRoot table{border-collapse:collapse;width:100%}
+  #printRoot th{color:var(--pc);text-align:left;font-weight:600;border-bottom:1.5pt solid var(--pc);background:#fff;position:static}
+  #printRoot td{vertical-align:top}
+  #printRoot thead{display:table-header-group}
+  #printRoot tr{break-inside:avoid}
+  .p-page{break-after:page}
+  .p-page:last-child{break-after:auto}
+
+  /* --- Tabela zwarta: kilka bloków dni obok siebie --- */
+  .tpl-compact table{font-size:7.3pt;line-height:1.15;font-family:system-ui,"Segoe UI",sans-serif}
+  .tpl-compact th{font-size:7.3pt;padding:1px 3px}
+  .tpl-compact td{padding:.6px 3px;border-bottom:.5pt solid #ccc}
+  .tpl-compact td.date{white-space:nowrap;color:#333;width:1%}
+  .tpl-compact .sep{border-left:1.5pt solid var(--pc);padding-left:5px}
+  .tpl-compact tbody tr:nth-child(even) td{background:#faf6f1}
+  .tpl-compact.mono tbody tr:nth-child(even) td{background:#f2f2f2}
+
+  /* --- Lista do odhaczania --- */
+  .tpl-checklist table{font-size:9pt;line-height:1.3;font-family:system-ui,"Segoe UI",sans-serif}
+  .tpl-checklist th{font-size:8.5pt;padding:2px 5px}
+  .tpl-checklist td{padding:2.2px 5px;border-bottom:.5pt solid #bbb}
+  .tpl-checklist td.date{white-space:nowrap;width:1%;color:#333}
+  .tpl-checklist tr.week td{border-top:1.2pt solid #888}
+  .tpl-checklist .box{display:inline-block;width:3.2mm;height:3.2mm;border:.8pt solid #444;border-radius:.6mm;margin-right:2mm;vertical-align:-.5mm}
+  .tpl-checklist td.notes{width:22%;border-bottom:.5pt dotted #999}
+
+  /* --- Kalendarz miesięczny --- */
+  .tpl-calendar .p-page{display:flex;flex-direction:column;height:186mm}
+  .tpl-calendar .month{font-size:16pt;color:var(--pc);margin:0 0 2mm;display:flex;justify-content:space-between;align-items:baseline}
+  .tpl-calendar .month small{font-size:8pt;color:#666}
+  .tpl-calendar table{table-layout:fixed;flex:1;height:100%;font-family:system-ui,"Segoe UI",sans-serif}
+  .tpl-calendar th{text-align:center;font-size:8pt;padding:1mm}
+  .tpl-calendar td{border:.6pt solid #999;padding:1mm 1.3mm;font-size:6.6pt;line-height:1.22}
+  .tpl-calendar td .dn{display:block;font-size:9pt;font-weight:600;color:var(--pc);text-align:right;margin-bottom:.6mm}
+  .tpl-calendar td.out{background:#f4f4f4;border-color:#ddd}
+  .tpl-calendar td.out .dn{color:#bbb}
+  .tpl-calendar td.rest .dn{color:#999}
+  .tpl-calendar td .r{display:block}
+  .tpl-calendar td .r + .r{border-top:.4pt dotted #bbb;margin-top:.5mm;padding-top:.5mm}
+
+  /* --- Zakładki do wycięcia --- */
+  .tpl-bookmarks .strips{column-count:4;column-gap:10mm;column-rule:.6pt dashed #999;font-family:system-ui,"Segoe UI",sans-serif;font-size:7pt;line-height:1.25}
+  .tpl-bookmarks .bm-day{break-inside:avoid;padding:.6mm 0;border-bottom:.4pt solid #ddd}
+  .tpl-bookmarks .bm-day b{color:var(--pc);font-weight:600;margin-right:1.5mm}
+  .tpl-bookmarks .bm-day .box{display:inline-block;width:2.4mm;height:2.4mm;border:.6pt solid #555;margin-right:1.2mm;vertical-align:-.3mm}
+  .tpl-bookmarks .bm-day span.r{display:block;padding-left:3.6mm}
+  .tpl-bookmarks .bm-head{break-inside:avoid;text-align:center;margin-bottom:2mm}
+  .tpl-bookmarks .bm-head .p-title{font-size:11pt}
+  .tpl-bookmarks .bm-head .p-sub{font-size:7pt;margin:.5mm 0 1mm}
+
+  /* --- Kartka tygodniowa --- */
+  .tpl-weekly .weeks{display:grid;grid-template-columns:1fr 1fr;gap:4mm;font-family:system-ui,"Segoe UI",sans-serif}
+  .tpl-weekly .wk{break-inside:avoid;border:.6pt solid #aaa;border-radius:2mm;padding:2mm 3mm}
+  .tpl-weekly .wk h3{margin:0 0 1mm;font-family:Georgia,serif;font-size:9pt;color:var(--pc)}
+  .tpl-weekly .wk table{font-size:7.6pt;line-height:1.25}
+  .tpl-weekly .wk td{padding:.7mm 1mm;border-top:.4pt solid #ddd}
+  .tpl-weekly .wk td.date{white-space:nowrap;width:1%;color:#444}
+  .tpl-weekly .box{display:inline-block;width:2.6mm;height:2.6mm;border:.6pt solid #555;margin-right:1.4mm;vertical-align:-.3mm}
+}
