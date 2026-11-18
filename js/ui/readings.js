@@ -38,7 +38,7 @@ export function renderReadings(host, state, canon, available, onChange){
         for(let b = s.from; b <= s.to; b++) if(available.has(b) && !state.own[i].includes(b)) state.own[i].push(b);
         onChange();
       }}, '+ grupa');
-      box.append(el('div', {className: 'addrow', style: 'grid-template-columns:1fr auto auto'}, bsel, add, addSection));
+      box.append(el('div', {className: 'addrow'}, bsel, add, addSection));
       const sorted = state.own[i].slice().sort((a, b) => a - b);
       box.append(el('div', {className: 'tags'}, sorted.map(b =>
         el('span', {className: 'tag'}, name(b),

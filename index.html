@@ -8,10 +8,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta name="theme-color" content="#7a2e1d">
-<script>
-  // motyw ustawiany przed wczytaniem stylów (bez mignięcia)
-  try{ const t = localStorage.getItem('plan-motyw'); if(t && t !== 'auto') document.documentElement.dataset.theme = t; }catch(e){}
-</script>
+<script src="js/theme-init.js"></script>
 <link rel="stylesheet" href="assets/css/app.css">
 <link rel="stylesheet" href="assets/css/print.css">
 <script type="module" src="js/main.js"></script>
@@ -121,7 +118,7 @@
     <div class="two">
       <div class="cal">
         <span class="lab">Data startu</span>
-        <div style="position:relative">
+        <div class="cal-field">
           <input type="text" id="start" value="2027-01-01" inputmode="numeric" placeholder="RRRR-MM-DD" aria-label="Data startu" autocomplete="off">
           <button type="button" class="cal-btn" id="calBtn" aria-label="Wybierz datę" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
         </div>
@@ -132,7 +129,7 @@
         <input type="number" id="ndays" value="365" min="1" max="800" aria-label="Liczba dni">
       </div>
     </div>
-    <p class="hint" style="margin-top:8px">Dni z czytaniem <button type="button" class="qb" data-h="dni" aria-label="Wyjaśnienie" aria-expanded="false">?</button></p>
+    <p class="hint days-label">Dni z czytaniem <button type="button" class="qb" data-h="dni" aria-label="Wyjaśnienie" aria-expanded="false">?</button></p>
     <div class="days" id="days">
       <label><input type="checkbox" value="0" checked>Pn</label>
       <label><input type="checkbox" value="1" checked>Wt</label>

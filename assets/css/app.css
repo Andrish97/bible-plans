@@ -111,7 +111,7 @@ label.check.off input{cursor:not-allowed}
 .reading{margin:0 0 8px}
 .reading .rhead{display:flex;align-items:baseline;gap:8px;font-weight:600;color:var(--accent);font-size:12.5px;margin-bottom:3px}
 .reading .cnt{font-weight:400;color:var(--muted);font-size:11px}
-.addrow{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:6px}
+.addrow{display:grid;grid-template-columns:1fr auto auto;gap:6px;margin-top:6px}
 .addrow button{padding:6px 12px}
 .tags{display:flex;flex-wrap:wrap;gap:2px;margin-top:6px}
 .tag{display:inline-flex;align-items:center;gap:4px;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:12px;margin:2px}
@@ -147,7 +147,9 @@ select.native{display:none!important}
 
 /* ==== Kalendarz daty startu =============================================== */
 .cal{position:relative}
+.cal-field{position:relative}
 #start{padding-right:38px}
+.days-label{margin-top:8px}
 .cal-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:30px;height:30px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--accent);display:inline-flex;align-items:center;justify-content:center}
 .cal-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
 .cal-btn:hover{background:var(--chip)}
