@@ -65,6 +65,20 @@ for r,name in D['threads']:
 threads.sort()
 for a,b in zip(threads,threads[1:]):
     if a[0]==b[0]: errors.append(f'dwa wątki od tej samej historii: {a[1]} / {b[1]}')
+bounds=[i for i,_ in threads]+[len(S)]
+def comp(cs):
+    out=[];a=b=None
+    for c in cs:
+        if b is not None and c==b+1: b=c; continue
+        if a is not None: out.append(f'{a}–{b}' if a!=b else f'{a}')
+        a=b=c
+    if a is not None: out.append(f'{a}–{b}' if a!=b else f'{a}')
+    return ', '.join(out)
+for n,(i,name) in enumerate(threads):
+    m=re.fullmatch(r'(Psalmy [^()]*?) \(Ps [^)]*\)',name)
+    if m:
+        cs=sorted({p['ks'][0][1] for st in S[i:bounds[n+1]] for p in st['parts'] if p['ks'][0][0]==19})
+        threads[n]=(i,f'{m[1]} (Ps {comp(cs)})')
 json.dump({'stories':S,'threads':threads},open('/tmp/claude-0/tyn/structured.json','w'),ensure_ascii=False)
 print('BŁĘDY:' if errors else 'bez błędów', *errors, sep='\n  ')
 print('historii:',len(S),'wątków:',len(threads))
