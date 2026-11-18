@@ -1,0 +1,40 @@
+name: Pobierz plan YouVersion
+
+# Pobiera odnośniki planu "The One Year Chronological Bible" z bible.com i zapisuje je
+# w sources/chronology/plan_youversion.txt na tej samej gałęzi.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - tools/youversion_plan.py
+      - .github/workflows/youversion.yml
+
+permissions:
+  contents: write
+
+jobs:
+  pobierz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install requests beautifulsoup4
+      - name: Pobierz 365 dni
+        run: python3 tools/youversion_plan.py --out sources/chronology/plan_youversion.txt --delay 1.5
+      - name: Podgląd
+        run: head -20 sources/chronology/plan_youversion.txt; grep -c "BRAK" sources/chronology/plan_youversion.txt || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plan_youversion
+          path: sources/chronology/plan_youversion.txt
+      - name: Zapisz wynik na gałęzi
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sources/chronology/plan_youversion.txt
+          git commit -m "Plan YouVersion: odnośniki 365 dni (pobrane przez GitHub Actions)" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
