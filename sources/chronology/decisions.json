@@ -1772,5 +1772,10 @@
    "Jer 7:1",
    "Jer 26:1"
   ]
+ ],
+ "rules": [
+  "Proroctwo stoi tam, gdzie zostało wypowiedziane. Czas ustala teraźniejszość opisana w tekście (do kogo mówi, co się właśnie dzieje), a nie to, co jest zapowiadane. Gdy tekst nie mówi nic o swojej teraźniejszości – zostaje w kolejności księgi.",
+  "Psalm stoi przy historii, z którą łączy go tytuł albo treść (stopień: pewne / prawdopodobne / niepewne); psalmy bez wskazówki – w zbiorach.",
+  "Kolejność tekstu jest zachowana, chyba że chronologia albo relacja równoległa wymaga inaczej."
  ]
 }
