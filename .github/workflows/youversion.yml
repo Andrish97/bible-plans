@@ -22,6 +22,12 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install requests beautifulsoup4
+      - name: Próba – dni 1–2 (stop, jeśli strona nie zwraca odnośników)
+        run: |
+          mkdir -p sources/chronology
+          python3 tools/youversion_plan.py --start 1 --end 2 --out /tmp/proba.txt --delay 1
+          cat /tmp/proba.txt
+          ! grep -q "BRAK" /tmp/proba.txt
       - name: Pobierz 365 dni
         run: python3 tools/youversion_plan.py --out sources/chronology/plan_youversion.txt --delay 1.5
       - name: Podgląd
