@@ -44,6 +44,11 @@ for src,dst,why in D.get('place',[]):
     if len(S[i]['parts'])!=1: errors.append(f'place: {src} nie jest osobną historią'); continue
     st=S.pop(i); st['why']=st['why']+['ręcznie (nie Tyndale): '+why]; st['moved']=True
     om=owner_map(); j=om[key(dst)]; S.insert(j+1,st)
+for a,b,dst,why in D.get('move_span',[]):
+    om=owner_map(); i,j=om[key(a)],om[key(b)]; blk=S[i:j+1]; del S[i:j+1]
+    for st in blk: st['why']=st['why']+['ręcznie (nie Tyndale): '+why]; st['moved']=True
+    bef=dst.startswith('<'); om=owner_map(); k=om[key(dst.lstrip('<'))]
+    S[k if bef else k+1:k if bef else k+1]=blk
 for src,dst,why in D.get('move_part',[]):
     om=owner_map(); i=om[key(src)]; st=S[i]
     pi=next(n for n,p in enumerate(st['parts']) if tuple(p['ks'][0])==key(src)); part=st['parts'].pop(pi)

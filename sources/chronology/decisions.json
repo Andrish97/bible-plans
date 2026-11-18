@@ -616,7 +616,7 @@
   ],
   [
    "Prov 1:1",
-   "Przysłowia Salomona (Prz 1–24)"
+   "Przysłowia Salomona (Prz 1,1–22,16)"
   ],
   [
    "Song 1:1",
@@ -624,7 +624,7 @@
   ],
   [
    "1Kgs 11:1",
-   "Odstępstwo i śmierć Salomona"
+   "Odstępstwo Salomona"
   ],
   [
    "Eccl 1:1",
@@ -684,11 +684,11 @@
   ],
   [
    "2Kgs 18:1",
-   "Hiskiasz w Judzie, Ozeasz w Izraelu"
+   "Hiskiasz w Judzie, król Ozeasz w Izraelu"
   ],
   [
    "Hos 1:1",
-   "Księga Ozeasza"
+   "Ozeasz za Jeroboama II (Oz 1–3)"
   ],
   [
    "Isa 28:1",
@@ -697,6 +697,14 @@
   [
    "Isa 1:1",
    "(część 4) Izajasz i Hiskiasz"
+  ],
+  [
+   "1Kgs 11:14",
+   "Przeciwnicy i śmierć Salomona"
+  ],
+  [
+   "Hos 4:1",
+   "Ozeasz: ostatnie lata Izraela (Oz 4–14)"
   ]
  ],
  "split": [
@@ -1036,6 +1044,32 @@
   [
    "2Kgs 14:28",
    "2Kgs 15:27"
+  ]
+ ],
+ "move_span": [
+  [
+   "Song 1:1",
+   "Song 8:14",
+   "Ps 127:5",
+   "kolejność ksiąg Salomona: Pieśń nad Pieśniami (młodość), Przysłowia (dojrzałość), Kohelet (starość)."
+  ],
+  [
+   "Eccl 1:1",
+   "Eccl 12:14",
+   "1Kgs 11:13",
+   "Kohelet to Salomon w starości (1,1.12.16; 2,4–9) – po odstępstwie „w starości” (1 Krl 11,4), a przed wzmianką o jego śmierci (11,41–43)."
+  ],
+  [
+   "Prov 22:17",
+   "Prov 24:34",
+   "<Prov 25:1",
+   "Prz 22,17–24,34 to „słowa mędrców” (22,17; 24,23), nie Salomona; nikt z nich nie jest nigdzie wspomniany – dołączone do zbioru spisanego za Hiskiasza (25,1) razem z Agurem i Lemuelem."
+  ],
+  [
+   "Hos 1:1",
+   "Hos 3:5",
+   "Amos 9:15",
+   "Oz 1,4: „jeszcze krótko, a nawiedzę krew Jizreela na domu Jehu” – przed końcem dynastii Jehu (2 Krl 15,10–12), za Jeroboama II, obok Amosa."
   ]
  ]
 }
