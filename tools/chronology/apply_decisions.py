@@ -75,7 +75,7 @@ def comp(cs):
     if a is not None: out.append(f'{a}–{b}' if a!=b else f'{a}')
     return ', '.join(out)
 for n,(i,name) in enumerate(threads):
-    m=re.fullmatch(r'(Psalmy [^()]*?) \(Ps [^)]*\)',name)
+    m=re.fullmatch(r'(.*?) \(Ps [^)]*\)',name)
     if m:
         cs=sorted({p['ks'][0][1] for st in S[i:bounds[n+1]] for p in st['parts'] if p['ks'][0][0]==19})
         threads[n]=(i,f'{m[1]} (Ps {comp(cs)})')
