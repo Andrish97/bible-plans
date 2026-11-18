@@ -23,14 +23,15 @@ const models = new Map();
 export async function loadTranslation(info){
   if(!models.has(info.id)){
     models.set(info.id, (async () => {
-      const [canon, structure, headings, chron] = await Promise.all([
+      const [canon, structure, headings, chron, versification] = await Promise.all([
         loadCanon(),
         getJson(`data/translations/${info.id}/structure.json`),
         info.headings ? getJson(`data/translations/${info.id}/headings.json`, true) : null,
         loadChronology(),
+        getJson(`data/translations/${info.id}/versification.json`, true),
       ]);
       const tr = new Translation(info, structure, headings, canon);
-      tr.chronology = tr.mapChronology(chron);
+      tr.chronology = tr.mapChronology(chron, versification);
       return tr;
     })());
   }

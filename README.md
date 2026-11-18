@@ -43,6 +43,7 @@ tools/                     skrypty konwersji i test kompletności
 | `translations.json` | spis przekładów: skrót, nazwa, zakres ksiąg, liczba wersetów, czy ma nagłówki |
 | `translations/<id>/structure.json` | budowa przekładu: liczba słów w każdym wersecie (`null` = wersetu nie ma). Na tym liczony jest plan |
 | `translations/<id>/headings.json` | początki sekcji (tylko przekłady z nagłówkami) |
+| `translations/<id>/versification.json` | rozdziały, w których numeracja przekładu jest przesunięta względem chronologii: pary wersetów dopasowane automatycznie po treści |
 | `translations/<id>/text/NN.json` | czysty tekst księgi NN: `{c, verses: [{v, t, h?, n?}]}`; `t` tekst (wiersze poezji rozdzielone `\n`), `h` nagłówki przed wersetem, `n` przypisy `{m: znacznik, t: treść}` |
 | `chronology.json` | uniwersalna kolejność chronologiczna (1749 pasaży) + liczba wersetów w rozdziałach numeracji, w której ją zapisano |
 
@@ -69,26 +70,34 @@ wrzucić do `sources/mybible/` i dopisać w `TRANSLATIONS` w `tools/convert_mybi
 Przekłady różnią się numeracją (np. Lb 16/17, 1 Krn 5/6, Jl 2/3, Ml 3/4, tytuły psalmów). Chronologia jest
 zapisana raz, w jednej numeracji, a aplikacja przelicza ją na wybrany przekład (`Translation.mapChronology`):
 
-1. W odcinkach księgi, w których oba przekłady mają tyle samo wersetów, werset liczony jest po kolejnym
-   numerze w księdze – przesunięta granica rozdziału trafia we właściwe miejsce.
-2. Gdzie sumy się nie zgadzają (np. numeracja tytułów psalmów), zostaje rozdział:werset bez zmian.
-3. Werset, którego nie objął żaden zakres, dołącza do pasażu sąsiedniego wersetu; powtórzony zostaje w pierwszym.
+1. **Przesunięta granica rozdziału** (np. Lb 16/17, 1 Krn 5/6, Ml 3/4): gdy w odcinku między punktami, w których
+   oba przekłady mają tyle samo wersetów od początku księgi, różnią się wszystkie rozdziały, werset liczony jest
+   po kolejnym numerze w księdze.
+2. **Przesunięcie wewnątrz rozdziału** (werset podzielony albo połączony, tytuł psalmu jako werset, np. NBG Pwt 5,
+   gdzie cztery przykazania są w jednym wersecie): konwerter dopasowuje wersety rozdziału po treści do przekładu
+   o numeracji zgodnej z chronologią (dopasowanie z zachowaniem kolejności) i zapisuje pary w `versification.json`.
+3. W pozostałych miejscach zostaje rozdział:werset bez zmian.
+4. Werset, którego nie objął żaden zakres, dołącza do pasażu poprzedniego wersetu tej samej księgi;
+   powtórzony zostaje w pierwszym.
 
 `node tools/check.mjs` sprawdza dla każdego przekładu i kilku ustawień, że plan zawiera każdy werset
-dokładnie raz.
+dokładnie raz. `node tools/verify_boundaries.mjs` sprawdza po treści każdą granicę pasażu w środku rozdziału
+(ok. 3100 granic we wszystkich przekładach; obecnie 0 podejrzanych).
 
 ### Uwagi o modułach źródłowych
 
 - **BW**: moduł nie zawiera części wersetów numeracji hebrajskiej (m.in. Lb 17:14-28, Lb 30:17, 1 Krn 5:27-41,
-  1 Krn 12:41, Ez 21:33-37), a w ich miejscu ma zaślepki `- - -`. Zaślepki są pomijane. Odnośniki w planie
+  1 Krn 12:41, 2 Krn 1:18, Ez 21:33-37), a w ich miejscu ma zaślepki `- - -`. Zaślepki są pomijane. Odnośniki w planie
   pozostają poprawne (np. „Lb 17” to cały rozdział), tylko liczba słów w tych dniach jest nieco zaniżona.
 - **SNPD**: wiersz bez numeru w 2 Krl 15 to duplikat wersetu 27 – usuwany przy konwersji.
 - **SNP**: brak Dz 24:7 (tak jest w przekładzie).
+- **NBG**: werset 109:1 w Psalmach to treściowo zakończenie Ps 108 – w chronologii trafia do Ps 108.
 
 ## Narzędzia
 
 ```sh
 python3 tools/convert_mybible.py        # sources/mybible/*.mybible -> data/translations/
 node tools/check.mjs                    # test kompletności planów
+node tools/verify_boundaries.mjs        # weryfikacja treściowa granic chronologii
 python3 tools/extract_legacy.py OLD.html  # jednorazowo: chronologia i nagłówki BW z dawnego index.html
 ```

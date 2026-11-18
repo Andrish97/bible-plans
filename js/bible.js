@@ -78,17 +78,23 @@ export class Translation {
    * w księdze – to obsługuje przesunięte granice rozdziałów (Lb 16/17, 1 Krn 5/6, Jl 2/3, Ml 3/4…).
    * Gdzie sumy się nie zgadzają (np. numeracja tytułów psalmów) zostaje rozdział:werset bez zmian.
    */
-  pointMapper(b, refChapters){
+  pointMapper(b, refChapters, fixes){
     const ref = refChapters;
     const own = (this.books.get(b) || []).map(c => c.length);
     const cum = a => a.reduce((acc, x) => (acc.push((acc.at(-1) || 0) + x), acc), []);
     const cr = cum(ref), ct = cum(own);
     const index = new Array(ref.length + 1).fill(false);    // index[c] = rozdział c liczony po numerze w księdze
+    // odcinek między punktami zgodności to przesunięta granica tylko wtedy, gdy różnią się wszystkie jego rozdziały
+    // (np. Lb 16/17); rozdział o tej samej długości w środku odcinka oznacza podział/połączenie wersetu wewnątrz
+    const mark = (from, to) => {
+      for(let k = from; k <= to; k++) if(ref[k - 1] === own[k - 1]) return;
+      for(let k = from; k <= to; k++) index[k] = true;
+    };
     let start = 1;
     for(let c = 1; c <= ref.length; c++){
-      if(c <= own.length && cr[c - 1] === ct[c - 1]){ for(let k = start; k <= c; k++) index[k] = true; start = c + 1; }
+      if(c <= own.length && cr[c - 1] === ct[c - 1]){ mark(start, c); start = c + 1; }
     }
-    if(cr.at(-1) === ct.at(-1)) for(let k = start; k <= ref.length; k++) index[k] = true;
+    if(cr.at(-1) === ct.at(-1) && start <= ref.length) mark(start, ref.length);
     const toOwn = o => {                                     // numer w księdze -> [rozdział, werset]
       let c = ct.findIndex(x => x >= o) + 1;
       if(c === 0) c = own.length;
@@ -98,6 +104,19 @@ export class Translation {
       /** Punkt odniesienia -> punkt przekładu. atEnd = koniec rozdziału; początek za końcem rozdziału = pusty zakres. */
       map: (c, v, atEnd, isStart) => {
         if(c > ref.length) return atEnd ? [c, this.last(b, c)] : [c, v];
+        const fix = !index[c] && fixes?.get(c);
+        if(fix && !atEnd){
+          // dopasowanie po treści: werset wzorca -> werset przekładu (najbliższa znana para poniżej/powyżej)
+          // werset 1 bez pewnej pary: początek rozdziału zostaje początkiem rozdziału
+          if(v === 1 && isStart && !fix.some(([rv]) => rv === 1)) return [c, 1];
+          let lo = null, hi = null;
+          for(const [rv, ov] of fix){ if(rv <= v) lo = [rv, ov]; else if(!hi) hi = [rv, ov]; }
+          const p = lo || hi;
+          const w = v + (p[1] - p[0]);
+          // werset przed początkiem rozdziału w przekładzie (jest na końcu poprzedniego): zakres pusty
+          if(w < 1) return isStart ? [c, 1] : [c, 0];
+          return [c, w];
+        }
         if(index[c]){
           if(isStart && v > ref[c - 1]) return [Infinity, 0];
           const vv = atEnd ? ref[c - 1] : Math.min(v, ref[c - 1]);
@@ -116,16 +135,24 @@ export class Translation {
    *  - werset, którego nie objął żaden zakres, dołącza do pasażu poprzedniego wersetu tej samej księgi
    *    (albo następnego, gdy to początek księgi).
    * @param {object} chron  data/chronology.json (zakresy + liczba wersetów w rozdziałach numeracji odniesienia)
+   * @param {object} [versification] data/translations/<id>/versification.json – rozdziały z przesuniętą numeracją
    * @returns {{entries: number[][][], attached: string[], duplicates: number}}
    */
-  mapChronology(chron){
+  mapChronology(chron, versification){
+    const fixes = new Map();                   // księga -> Map(rozdział -> [[werset wzorca, werset przekładu], …])
+    for(const [key, pairs] of Object.entries(versification?.chapters || {})){
+      const [o, c] = key.split(' ');
+      const b = this.osisToId.get(o);
+      if(!fixes.has(b)) fixes.set(b, new Map());
+      fixes.get(b).set(+c, pairs);
+    }
     const owner = new Map();                   // 'b.c.v' -> indeks pasażu
     const lists = chron.entries.map(() => []); // indeks pasażu -> [[b,c,v], ...]
     const mappers = new Map();
     const mapper = b => {
       if(!mappers.has(b)){
         const refCh = chron.chapters?.[b];
-        mappers.set(b, refCh ? this.pointMapper(b, refCh) : {map: (c, v, atEnd) => [c, atEnd ? this.last(b, c) : v]});
+        mappers.set(b, refCh ? this.pointMapper(b, refCh, fixes.get(b)) : {map: (c, v, atEnd) => [c, atEnd ? this.last(b, c) : v]});
       }
       return mappers.get(b);
     };

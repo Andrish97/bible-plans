@@ -202,15 +202,18 @@ def point_mapper(ref, own):
     cum = lambda a: [sum(a[:i + 1]) for i in range(len(a))]
     cr, ct = cum(ref), cum(own)
     index = [False] * (len(ref) + 1)
+
+    def mark(a, b):  # przesunięta granica tylko, gdy różnią się wszystkie rozdziały odcinka
+        if all(k <= len(own) and ref[k - 1] != own[k - 1] for k in range(a, b + 1)):
+            for k in range(a, b + 1):
+                index[k] = True
     start = 1
     for c in range(1, len(ref) + 1):
         if c <= len(own) and cr[c - 1] == ct[c - 1]:
-            for k in range(start, c + 1):
-                index[k] = True
+            mark(start, c)
             start = c + 1
-    if ref and own and cr[-1] == ct[-1]:
-        for k in range(start, len(ref) + 1):
-            index[k] = True
+    if ref and own and cr[-1] == ct[-1] and start <= len(ref):
+        mark(start, len(ref))
 
     def to_own(o):
         c = next((i + 1 for i, x in enumerate(ct) if x >= o), len(own))
@@ -281,12 +284,105 @@ def write_headings(res, all_res):
     return len(kept)
 
 
+def words_set(t):
+    return {w for w in re.findall(r"\w+", t.lower()) if len(w) >= 4}
+
+
+def similarity(a, b):
+    A, B = words_set(a), words_set(b)
+    return len(A & B) / max(1, len(A | B))
+
+
+def chapter_texts(tid, b, c, cache={}):
+    key = (tid, b)
+    if key not in cache:
+        f = OUT / tid / "text" / f"{b:02d}.json"
+        cache[key] = json.loads(f.read_text(encoding="utf-8")) if f.exists() else None
+    d = cache[key]
+    if not d or c > len(d["chapters"]):
+        return {}
+    return {x["v"]: x["t"] for x in d["chapters"][c - 1]["verses"]}
+
+
+def align(pv, tv, gap=-0.02, min_sim=0.2):
+    """Dopasowanie wersetów rozdziału z zachowaniem kolejności (Needleman–Wunsch na podobieństwie słów).
+    pv, tv: {numer: tekst}. Zwraca {werset wzorca: werset przekładu} dla pewnych par."""
+    a, b = sorted(pv), sorted(tv)
+    n, m = len(a), len(b)
+    S = [[0.0] * (m + 1) for _ in range(n + 1)]
+    B = [[0] * (m + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        S[i][0], B[i][0] = S[i - 1][0] + gap, 1
+    for j in range(1, m + 1):
+        S[0][j], B[0][j] = S[0][j - 1] + gap, 2
+    sim = {}
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            x = similarity(pv[a[i - 1]], tv[b[j - 1]]) if abs(a[i - 1] - b[j - 1]) <= 6 else -1
+            sim[i, j] = x
+            S[i][j], B[i][j] = max((S[i - 1][j - 1] + x, 0), (S[i - 1][j] + gap, 1), (S[i][j - 1] + gap, 2))
+    pairs, i, j = {}, n, m
+    while i and j:
+        if B[i][j] == 0:
+            if sim[i, j] >= min_sim:
+                pairs[a[i - 1]] = b[j - 1]
+            i, j = i - 1, j - 1
+        elif B[i][j] == 1:
+            i -= 1
+        else:
+            j -= 1
+    return pairs
+
+
+def write_versification(res, all_res, chron_chapters):
+    """Poprawki numeracji względem numeracji chronologii, wykryte po treści.
+
+    Dotyczy rozdziałów, w których liczba wersetów różni się od odniesienia. Wersety rozdziału dopasowujemy
+    z zachowaniem kolejności do wzorca – innego przekładu, który w tym rozdziale ma numerację zgodną
+    z odniesieniem. Zapisujemy tylko pewne pary, w których numer się różni. Aplikacja używa ich tam,
+    gdzie nie da się przeliczyć wersetów po kolejnym numerze w księdze.
+    """
+    t, structure = res["t"], res["structure"]
+    fixes = {}
+    for b_str, chapters in structure.items():
+        b = int(b_str)
+        ref = chron_chapters.get(b_str)
+        if not ref:
+            continue
+        own = [len(x) for x in chapters]
+        for c in range(1, min(len(ref), len(own)) + 1):
+            if ref[c - 1] == own[c - 1]:
+                continue
+            pivot = next((o for o in all_res.values() if o["t"]["id"] != t["id"]
+                          and len(o["structure"].get(b_str, [])) >= c
+                          and len(o["structure"][b_str][c - 1]) == ref[c - 1]), None)
+            if not pivot:
+                continue
+            pv, tv = chapter_texts(pivot["t"]["id"], b, c), chapter_texts(t["id"], b, c)
+            pairs = align(pv, tv)
+            if any(v != w for v, w in pairs.items()):
+                fixes[f"{OSIS[b]} {c}"] = sorted(pairs.items())
+    path = res["out"] / "versification.json"
+    data = {"translation": t["id"],
+            "note": "Rozdziały, w których numeracja tego przekładu jest przesunięta względem numeracji chronologii: "
+                    "pary [werset w numeracji chronologii, werset w tym przekładzie], dopasowane automatycznie po treści.",
+            "chapters": fixes}
+    body = ",\n".join(f'  "{k}": ' + json.dumps(v, separators=(",", ":")) for k, v in fixes.items())
+    head = json.dumps({k: v for k, v in data.items() if k != "chapters"}, ensure_ascii=False, indent=1)[:-2]
+    path.write_text(head + ',\n "chapters": {\n' + body + "\n }\n}\n", encoding="utf-8")
+    print(f"   {t['id']}: {len(fixes)} rozdziałów z przesuniętą numeracją")
+    return len(fixes)
+
+
 def main():
     results = {}
     for t in TRANSLATIONS:
         r = convert(t)
         if r:
             results[t["id"]] = r
+    chron_chapters = json.loads((ROOT / "data/chronology.json").read_text(encoding="utf-8"))["chapters"]
+    for r in results.values():
+        write_versification(r, results, chron_chapters)
     index = []
     for tid, r in results.items():
         n = write_headings(r, results)

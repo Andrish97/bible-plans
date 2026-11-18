@@ -20,7 +20,8 @@ for(const info of translations){
   const tr = new Translation(info, json(`data/translations/${info.id}/structure.json`), existsSync(new URL(hp, root)) ? json(hp) : null, canon);
   const all = [];
   for(const b of tr.bookIds) for(let c = 1; c <= tr.chapters(b); c++) for(let v = 1; v <= tr.last(b, c); v++) if(tr.exists(b, c, v)) all.push(`${b}.${c}.${v}`);
-  const mapped = tr.mapChronology(chron);
+  const vp = `data/translations/${info.id}/versification.json`;
+  const mapped = tr.mapChronology(chron, existsSync(new URL(vp, root)) ? json(vp) : null);
   console.log(`${info.id}: ${all.length} wersetów, chronologia: ${mapped.entries.length} pasaży, dołączono ${mapped.attached.length}, duplikaty ${mapped.duplicates}, nagłówki ${tr.headSet.size}`);
 
   const cases = [
