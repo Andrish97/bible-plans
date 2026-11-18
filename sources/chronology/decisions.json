@@ -868,7 +868,51 @@
   ],
   [
    "2Chr 36:22",
-   "(część 6) Powrót z wygnania"
+   "Powrót z wygnania i fundamenty świątyni"
+  ],
+  [
+   "Dan 10:1",
+   "Ostatnie widzenie Daniela"
+  ],
+  [
+   "Ezra 4:24",
+   "Aggeusz i Zachariasz: odbudowa świątyni"
+  ],
+  [
+   "Zech 9:1",
+   "Zachariasz 9–14 i poświęcenie świątyni"
+  ],
+  [
+   "Ezra 4:6",
+   "Estera"
+  ],
+  [
+   "Ezra 4:7",
+   "Ezdrasz wraca do Jerozolimy"
+  ],
+  [
+   "Neh 1:1",
+   "Nehemiasz odbudowuje mury"
+  ],
+  [
+   "Neh 7:1",
+   "Lista powracających, Prawo, przymierze"
+  ],
+  [
+   "Neh 11:1",
+   "Zasiedlenie Jerozolimy i poświęcenie murów"
+  ],
+  [
+   "Neh 12:44",
+   "Drugi pobyt Nehemiasza, Malachiasz"
+  ],
+  [
+   "Joel 1:1",
+   "Joel"
+  ],
+  [
+   "Luke 1:1",
+   "(część 7) Ewangelie"
   ]
  ],
  "split": [
@@ -902,7 +946,9 @@
   "Hos 14:2",
   "Isa 28:1",
   "2Kgs 17:5",
-  "2Chr 30:1"
+  "2Chr 30:1",
+  "Ezra 3:1",
+  "Ezra 4:1"
  ],
  "move": [
   [
@@ -1100,6 +1146,11 @@
    "Ps 89:1",
    "2Kgs 24:15",
    "niepewne: pomazaniec odrzucony, korona i tron zrzucone na ziemię, „skróciłeś dni jego młodości” (89,39–46) – uprowadzenie 18-letniego Jojakina (2 Krl 24,8–15)."
+  ],
+  [
+   "Ps 107:1",
+   "Ps 126:6",
+   "prawdopodobne: „Niech powiedzą odkupieni przez JHWH… których zebrał z ziem: ze wschodu i zachodu, z północy i z południa” (107,2–3) – po powrocie z wygnania."
   ]
  ],
  "move_part": [
@@ -1137,6 +1188,11 @@
    "2Kgs 15:30",
    "<2Kgs 17:1",
    "2 Krl 15,30–31 (Ozeasz zabija Pekacha) to początek panowania Ozeasza – przed 2 Krl 17,1, a nie w historii Hiskiasza."
+  ],
+  [
+   "1Chr 3:19",
+   "1Chr 3:18",
+   "rodowód potomków Jechoniasza w całości (1 Krn 3,17–24) przed listą powracających."
   ]
  ],
  "merge_span": [
@@ -1579,6 +1635,74 @@
   [
    "Dan 9:1",
    "Dan 9:20"
+  ],
+  [
+   "Ezra 4:24",
+   "Hag 2:23"
+  ],
+  [
+   "Zech 1:7",
+   "Zech 1:14"
+  ],
+  [
+   "Ezra 6:1",
+   "Ezra 6:13"
+  ],
+  [
+   "Ezra 4:6",
+   "Esth 1:13"
+  ],
+  [
+   "Esth 2:1",
+   "Esth 2:19"
+  ],
+  [
+   "Esth 5:1",
+   "Esth 6:12"
+  ],
+  [
+   "Esth 7:1",
+   "Esth 7:8"
+  ],
+  [
+   "Esth 9:20",
+   "Esth 10:1"
+  ],
+  [
+   "Ezra 7:27",
+   "Ezra 8:1"
+  ],
+  [
+   "Ezra 8:15",
+   "Ezra 8:32"
+  ],
+  [
+   "Ezra 9:1",
+   "Ezra 9:6"
+  ],
+  [
+   "Mal 2:17",
+   "Mal 3:1"
+  ],
+  [
+   "Joel 1:1",
+   "Joel 1:2"
+  ],
+  [
+   "Zech 12:1",
+   "Zech 13:2"
+  ],
+  [
+   "Neh 7:1",
+   "Neh 7:6"
+  ],
+  [
+   "Neh 12:44",
+   "Neh 13:1"
+  ],
+  [
+   "Mal 3:13",
+   "Mal 3:22"
   ]
  ],
  "move_span": [
