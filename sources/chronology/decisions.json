@@ -59,6 +59,38 @@
   [
    "2Kgs 20:12",
    "Isa 39:1"
+  ],
+  [
+   "John 4:43",
+   "Luke 3:19"
+  ],
+  [
+   "Matt 12:15",
+   "Mark 3:7"
+  ],
+  [
+   "Luke 13:10",
+   "Luke 13:18"
+  ],
+  [
+   "Mark 14:12",
+   "Luke 22:7"
+  ],
+  [
+   "Mark 10:32",
+   "Luke 18:31"
+  ],
+  [
+   "Matt 16:1",
+   "Mark 8:11"
+  ],
+  [
+   "Mark 11:27",
+   "Matt 21:28"
+  ],
+  [
+   "Mark 11:1",
+   "Luke 19:41"
   ]
  ],
  "threads": [
@@ -912,7 +944,131 @@
   ],
   [
    "Luke 1:1",
-   "(część 7) Ewangelie"
+   "Wstęp i rodowód Jezusa"
+  ],
+  [
+   "Luke 1:5",
+   "Narodziny Jana i Jezusa"
+  ],
+  [
+   "Matt 2:1",
+   "Mędrcy, Egipt, Nazaret"
+  ],
+  [
+   "Mark 1:1",
+   "Jan Chrzciciel, chrzest i kuszenie Jezusa"
+  ],
+  [
+   "John 1:19",
+   "Pierwsi uczniowie i początek działalności (J 1–4)"
+  ],
+  [
+   "John 4:43",
+   "Początek działalności w Galilei"
+  ],
+  [
+   "Mark 1:40",
+   "Uzdrowienia i spory z faryzeuszami"
+  ],
+  [
+   "Matt 12:15",
+   "Wybór Dwunastu i kazanie na górze"
+  ],
+  [
+   "Matt 8:5",
+   "Setnik, Nain, pytanie Jana"
+  ],
+  [
+   "Mark 3:20",
+   "Spory i przypowieści nad jeziorem"
+  ],
+  [
+   "Mark 4:35",
+   "Cuda nad jeziorem i odrzucenie w Nazarecie"
+  ],
+  [
+   "Matt 9:35",
+   "Rozesłanie Dwunastu i śmierć Jana"
+  ],
+  [
+   "Matt 14:13",
+   "Chleb życia"
+  ],
+  [
+   "Mark 7:1",
+   "Tradycja, poganie, drugie rozmnożenie chleba"
+  ],
+  [
+   "Mark 8:27",
+   "Wyznanie Piotra i przemienienie"
+  ],
+  [
+   "Mark 9:33",
+   "Nauka o wielkości i przebaczaniu"
+  ],
+  [
+   "John 7:1",
+   "Święto Namiotów (J 7–8)"
+  ],
+  [
+   "Luke 10:1",
+   "W drodze do Jerozolimy: siedemdziesięciu dwóch, modlitwa, spory"
+  ],
+  [
+   "Luke 12:4",
+   "Nauki w drodze (Łk 12–13)"
+  ],
+  [
+   "John 9:1",
+   "Niewidomy od urodzenia, dobry pasterz, Chanuka"
+  ],
+  [
+   "Luke 13:22",
+   "Przypowieści o zagubionych i o bogactwie (Łk 13–17)"
+  ],
+  [
+   "John 11:1",
+   "Wskrzeszenie Łazarza"
+  ],
+  [
+   "Luke 17:11",
+   "Ostatnia droga do Jerozolimy"
+  ],
+  [
+   "Mark 14:3",
+   "Namaszczenie i wjazd do Jerozolimy"
+  ],
+  [
+   "Mark 11:12",
+   "Spory w świątyni"
+  ],
+  [
+   "Mark 13:1",
+   "Mowa na Górze Oliwnej"
+  ],
+  [
+   "Mark 14:1",
+   "Ostatnia wieczerza"
+  ],
+  [
+   "John 13:31",
+   "Mowa pożegnalna (J 13–17)"
+  ],
+  [
+   "John 18:1",
+   "Pojmanie, proces i ukrzyżowanie"
+  ],
+  [
+   "Mark 15:33",
+   "Śmierć i pogrzeb Jezusa"
+  ],
+  [
+   "Mark 16:1",
+   "Zmartwychwstanie i wniebowstąpienie"
+  ],
+  [
+   "Acts 1:12",
+   "(część 8) Dzieje Apostolskie"
   ]
  ],
  "split": [
@@ -948,7 +1104,36 @@
   "2Kgs 17:5",
   "2Chr 30:1",
   "Ezra 3:1",
-  "Ezra 4:1"
+  "Ezra 4:1",
+  "Mark 1:9",
+  "Mark 1:12",
+  "Luke 4:14",
+  "John 4:46",
+  "Luke 4:16",
+  "Mark 1:16",
+  "Mark 1:21",
+  "Luke 5:1",
+  "Mark 3:13",
+  "Matt 5:1",
+  "Matt 8:5",
+  "Luke 7:11",
+  "John 9:1",
+  "John 10:22",
+  "Luke 13:22",
+  "Mark 6:45",
+  "Mark 13:24",
+  "Mark 13:32",
+  "Mark 15:1",
+  "Mark 15:16",
+  "Mark 15:25",
+  "Mark 16:9",
+  "Luke 24:13",
+  "Mark 16:14",
+  "John 21:1",
+  "Matt 28:16",
+  "Mark 16:19",
+  "Mark 15:2",
+  "Mark 15:6"
  ],
  "move": [
   [
@@ -1193,6 +1378,16 @@
    "1Chr 3:19",
    "1Chr 3:18",
    "rodowód potomków Jechoniasza w całości (1 Krn 3,17–24) przed listą powracających."
+  ],
+  [
+   "Luke 4:14",
+   "<Mark 1:14",
+   "Łk 4,14–15 (powrót do Galilei) to relacja równoległa do Mk 1,14–15 i Mt 4,12–17 – u Tyndale stało przed świadectwem Jana (J 1,19–34) i całym J 2–4."
+  ],
+  [
+   "Matt 11:1",
+   "Matt 10:42",
+   "Mt 11,1: „Gdy Jezus skończył dawać wskazania swoim dwunastu uczniom” – zamyka mowę z Mt 10, u Tyndale stało przed nią."
   ]
  ],
  "merge_span": [
@@ -1699,6 +1894,154 @@
   [
    "Mal 3:13",
    "Mal 3:22"
+  ],
+  [
+   "Luke 1:39",
+   "Luke 1:46"
+  ],
+  [
+   "Luke 1:57",
+   "Luke 1:67"
+  ],
+  [
+   "Matt 2:13",
+   "Matt 2:19"
+  ],
+  [
+   "John 2:23",
+   "John 3:16"
+  ],
+  [
+   "John 3:22",
+   "John 3:31"
+  ],
+  [
+   "John 4:1",
+   "John 4:39"
+  ],
+  [
+   "John 5:19",
+   "John 5:24"
+  ],
+  [
+   "Matt 5:1",
+   "Luke 6:27"
+  ],
+  [
+   "Matt 6:1",
+   "Matt 6:24"
+  ],
+  [
+   "Matt 7:1",
+   "Luke 6:43"
+  ],
+  [
+   "Matt 11:20",
+   "Matt 11:27"
+  ],
+  [
+   "Luke 7:36",
+   "Luke 8:1"
+  ],
+  [
+   "Matt 12:22",
+   "Matt 12:43"
+  ],
+  [
+   "Luke 8:16",
+   "Matt 13:51"
+  ],
+  [
+   "Matt 9:27",
+   "Matt 9:32"
+  ],
+  [
+   "Matt 9:35",
+   "Mark 6:7"
+  ],
+  [
+   "Matt 18:12",
+   "Matt 18:21"
+  ],
+  [
+   "John 7:14",
+   "John 7:30"
+  ],
+  [
+   "John 7:37",
+   "John 7:45"
+  ],
+  [
+   "John 8:12",
+   "John 8:21"
+  ],
+  [
+   "Luke 10:1",
+   "Luke 10:21"
+  ],
+  [
+   "Luke 10:25",
+   "Luke 10:29"
+  ],
+  [
+   "Luke 11:1",
+   "Luke 11:9"
+  ],
+  [
+   "Luke 11:14",
+   "Luke 11:33"
+  ],
+  [
+   "Luke 12:13",
+   "Luke 12:22"
+  ],
+  [
+   "Luke 12:35",
+   "Luke 12:57"
+  ],
+  [
+   "Luke 13:22",
+   "Luke 13:34"
+  ],
+  [
+   "Luke 14:1",
+   "Luke 14:15"
+  ],
+  [
+   "Luke 15:1",
+   "Luke 15:8"
+  ],
+  [
+   "Luke 16:1",
+   "Luke 16:18"
+  ],
+  [
+   "Luke 17:1",
+   "Luke 17:7"
+  ],
+  [
+   "Luke 18:1",
+   "Luke 18:9"
+  ],
+  [
+   "John 12:20",
+   "John 12:37"
+  ],
+  [
+   "John 13:31",
+   "John 13:34"
+  ],
+  [
+   "John 14:1",
+   "John 14:27"
+  ],
+  [
+   "John 15:1",
+   "John 15:9"
+  ],
+  [
+   "John 15:18",
+   "John 16:7"
   ]
  ],
  "move_span": [
