@@ -267,6 +267,7 @@ function refreshControls(parts){
   $('orderHint').hidden = chronOk;
   $('orderHint').textContent = 'Chronologia: jedno czytanie (cała Biblia, Stary albo Nowy Testament) albo dwa (Stary i Nowy Testament).';
   $('noMixWrap').hidden = val('order') !== 'seq';
+  $('chronSeqWrap').hidden = val('order') !== 'chron';
   ctrl('noMixMode').disabled = !val('noMixOn');
   // rozdzielnik
   const sc = sepCheck();
@@ -319,12 +320,13 @@ function update(){
     weekdays: weekdays(),
   });
   const f = formatter(sepCheck().value);
+  const inOrder = chron && val('chronSeq');
   const P = parts.length;
   S.view = {
     parts: parts.map(p => p.name),
     rows: plan.rows.map(r => ({
       date: r.date,
-      texts: r.units ? r.units.map(us => us.length ? f.dayText(us) : '') : null,
+      texts: r.units ? r.units.map(us => us.length ? (inOrder ? f.seqText(us, f.bookSep) : f.dayText(us)) : '') : null,
       load: r.verses ? r.verses.reduce((a, b) => a + b, 0) : 0,
     })),
   };

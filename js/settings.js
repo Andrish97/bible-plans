@@ -14,7 +14,7 @@ export const CONTENT = [
 export function range(a, b){ const r = []; for(let i = a; i <= b; i++) r.push(i); return r; }
 
 /** Kontrolki zapisywane w przeglądarce (id elementu -> rodzaj). */
-export const CONTROLS = ['translation', 'abbr', 'refStyle', 'preset', 'nread', 'order', 'noMixOn', 'noMixMode', 'unit', 'noSplitCh', 'noSplitStory', 'useHeads',
+export const CONTROLS = ['translation', 'abbr', 'refStyle', 'preset', 'nread', 'order', 'noMixOn', 'noMixMode', 'unit', 'noSplitCh', 'noSplitStory', 'useHeads', 'chronSeq',
   'start', 'ndays', 'template', 'ptitle', 'mono', 'sep', 'sepOwn', 'csvDate', 'reminder', 'fname'];
 
 /**

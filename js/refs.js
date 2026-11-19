@@ -72,10 +72,14 @@ export class RefFormatter {
   }
 
   /** Wszystkie jednostki jednego czytania w jednym dniu -> tekst. */
-  /** Jednostki w podanej kolejności (np. historia z relacjami równoległymi): kolejne kawałki jednej księgi razem. */
+  /** Jednostki w podanej kolejności (kolejność czytania): kolejne kawałki jednej księgi idące naprzód – razem. */
   seqText(units, sep = '; '){
     const runs = [];
-    for(const u of units){ const r = runs[runs.length - 1]; if(r && r[0][0] === u[0]) r.push(u); else runs.push([u]); }
+    for(const u of units){
+      const r = runs[runs.length - 1], p = r && r[r.length - 1];
+      // ta sama księga i dalej w przód – jeden zapis; cofnięcie w księdze zaczyna nowy (np. 'Dn 7-8 | Dn 5')
+      if(p && p[0] === u[0] && (u[1] > p[1] || (u[1] === p[1] && u[2] > p[3]))) r.push(u); else runs.push([u]);
+    }
     return runs.map(l => this.bookText(l)).join(sep);
   }
   dayText(units){
