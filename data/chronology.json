@@ -20,7 +20,7 @@
    {"name": "Wejście do arki i wezbranie wód", "refs": "Gen 7:1-24"},
    {"name": "Koniec potopu i ofiara Noego", "refs": "Gen 8:1-22"},
    {"name": "Tęcza i przymierze z całym stworzeniem", "refs": "Gen 9:1-17"},
-   {"name": "Upojenie Noego, przekleństwo Kanaana, śmierć Noego", "refs": "Gen 9:18-29"}
+   {"name": "Synowie Noego i przekleństwo Kanaana", "refs": "Gen 9:18-29"}
   ]},
   {"name": "Narody i wieża Babel", "stories": [
    {"name": "Tablica narodów: synowie Sema, Chama i Jafeta", "refs": "Gen 10:1-5; 1Chr 1:5-7; Gen 10:6-20; 1Chr 1:8-16; Gen 10:21-30; 1Chr 1:17-23; Gen 10:31-32"},
@@ -36,7 +36,7 @@
    {"name": "Błogosławieństwo Melchizedeka", "refs": "Gen 14:17-24"}
   ]},
   {"name": "Przymierze z Abrahamem i obietnica syna", "stories": [
-   {"name": "Przymierze między połówkami zwierząt", "refs": "Gen 15:1-21"},
+   {"name": "Obietnica potomstwa i przymierze z Abramem", "refs": "Gen 15:1-21"},
    {"name": "Ucieczka Hagar i narodziny Ismaela", "refs": "Gen 16:1-16"},
    {"name": "Obrzezanie i nowe imiona Abrahama i Sary", "refs": "Gen 17:1-27"},
    {"name": "Trzej goście w Mamre", "refs": "Gen 18:1-15"}
@@ -236,7 +236,7 @@
    {"name": "Słup obłoku i ognia", "refs": "Exod 13:17-22"},
    {"name": "Rozstąpienie się morza", "refs": "Exod 14:1-31"},
    {"name": "Pieśń zwycięstwa nad morzem", "refs": "Exod 15:1-19"},
-   {"name": "Miriam i kobiety z bębenkami", "refs": "Exod 15:20-21"}
+   {"name": "Pieśń Miriam", "refs": "Exod 15:20-21"}
   ]},
   {"name": "Na pustyni: manna, woda, Amalekici, Jetro", "stories": [
    {"name": "Gorzka woda w Mara", "refs": "Exod 15:22-27"},
@@ -299,7 +299,7 @@
    {"name": "Wezwanie rzemieślników do pracy", "refs": "Exod 35:10-19"},
    {"name": "Dobrowolne dary mężczyzn i kobiet", "refs": "Exod 35:20-29"},
    {"name": "Besalel i Oholiab na czele prac", "refs": "Exod 35:30-36:1"},
-   {"name": "Darów aż za dużo", "refs": "Exod 36:2-7"},
+   {"name": "Lud przynosi więcej, niż potrzeba", "refs": "Exod 36:2-7"},
    {"name": "Wykonanie zasłon i desek przybytku", "refs": "Exod 36:8-38"},
    {"name": "Besalel wykonuje arkę", "refs": "Exod 37:1-9"},
    {"name": "Stół z naczyniami", "refs": "Exod 37:10-16"},
@@ -307,7 +307,7 @@
    {"name": "Ołtarz do kadzenia", "refs": "Exod 37:25-28"},
    {"name": "Olej namaszczenia i kadzidło", "refs": "Exod 37:29"},
    {"name": "Miedziany ołtarz całopaleń", "refs": "Exod 38:1-7"},
-   {"name": "Misa z luster kobiet", "refs": "Exod 38:8"},
+   {"name": "Wykonanie miedzianej misy", "refs": "Exod 38:8"},
    {"name": "Zasłony dziedzińca", "refs": "Exod 38:9-20"},
    {"name": "Rozliczenie złota, srebra i miedzi", "refs": "Exod 38:21-31"},
    {"name": "Efod, pektorał i diadem Aarona", "refs": "Exod 39:1-31"}
@@ -380,7 +380,7 @@
    {"name": "Zaraza w ścianach domu", "refs": "Lev 14:33-57"},
    {"name": "Wstęp do praw o wyciekach", "refs": "Lev 15:1"},
    {"name": "Chorobliwy wyciek u mężczyzny", "refs": "Lev 15:2-15"},
-   {"name": "Wytrysk nasienia", "refs": "Lev 15:16-18"},
+   {"name": "Nieczystość po wypływie nasienia", "refs": "Lev 15:16-18"},
    {"name": "Miesięczne krwawienie kobiety", "refs": "Lev 15:19-24"},
    {"name": "Przedłużone krwawienie kobiety", "refs": "Lev 15:25-33"}
   ]},
@@ -713,7 +713,7 @@
    {"name": "Strach królów Kanaanu", "refs": "Josh 5:1"},
    {"name": "Obrzezanie w Gilgal", "refs": "Josh 5:2-9"},
    {"name": "Pascha w Gilgal i koniec manny", "refs": "Josh 5:10-12"},
-   {"name": "Mąż z dobytym mieczem pod Jerychem", "refs": "Josh 5:13-15"},
+   {"name": "Wódz zastępów Pana przed Jozuem", "refs": "Josh 5:13-15"},
    {"name": "Upadek murów Jerycha", "refs": "Josh 6:1-27"}
   ]},
   {"name": "Grzech Akana, Aj i Gibeonici", "stories": [
@@ -800,7 +800,7 @@
    {"name": "Ucisk ze strony Midianitów", "refs": "Judg 6:1-6"},
    {"name": "Prorok przypomina wyjście z Egiptu", "refs": "Judg 6:7-10"},
    {"name": "Anioł w Ofrze i znak runa", "refs": "Judg 6:11-40"},
-   {"name": "Trzystu z dzbanami i pochodniami", "refs": "Judg 7:1-25"},
+   {"name": "Gedeon i trzystu wojowników", "refs": "Judg 7:1-25"},
    {"name": "Łagodzenie gniewu Efraimitów", "refs": "Judg 8:1-3"},
    {"name": "Odmowa chleba w Sukkot i Penuel", "refs": "Judg 8:4-9"},
    {"name": "Rozbicie obozu w Karkor", "refs": "Judg 8:10-12"},
@@ -829,8 +829,8 @@
   {"name": "Samson", "stories": [
    {"name": "Zapowiedź narodzin Samsona", "refs": "Judg 13:1-25"},
    {"name": "Zagadka na weselu w Timnie", "refs": "Judg 14:1-20"},
-   {"name": "Lisy z pochodniami i ośla szczęka", "refs": "Judg 15:1-20"},
-   {"name": "Bramy Gazy na ramionach", "refs": "Judg 16:1-3"},
+   {"name": "Samson mści się na Filistynach", "refs": "Judg 15:1-20"},
+   {"name": "Samson w Gazie", "refs": "Judg 16:1-3"},
    {"name": "Zdrada Dalili", "refs": "Judg 16:4-20"},
    {"name": "Ostatnie zwycięstwo Samsona", "refs": "Judg 16:21-31"}
   ]},
@@ -904,7 +904,7 @@
   ]},
   {"name": "Dawid ucieka: Jonatan, Nob, Gat", "stories": [
    {"name": "Strzały Jonatana i pożegnanie", "refs": "1Sam 20:1-21:1"},
-   {"name": "Chleby pokładne i miecz Goliata", "refs": "1Sam 21:2-10"},
+   {"name": "Dawid u kapłana Achimeleka w Nob", "refs": "1Sam 21:2-10"},
    {"name": "Dawid udaje szaleńca w Gat", "refs": "1Sam 21:11-16"},
    {"name": "Pan blisko skruszonych w sercu", "refs": "Ps 34:1-23"},
    {"name": "Ufność w Bogu pośród strachu", "refs": "Ps 56:1-14", "note": ["tytuł: „gdy Filistyni schwytali go w Gat” – pierwsza ucieczka do Gat (1 Sm 21,11–16), ta sama co w Ps 34 – a nie drugi pobyt u Akisza (1 Sm 29)."]}
@@ -927,11 +927,11 @@
    {"name": "Jonatan umacnia Dawida na pustyni", "refs": "1Sam 23:14-18"},
    {"name": "Donos Zifitów i pościg Saula", "refs": "1Sam 23:19-24:1"},
    {"name": "Bóg moim wspomożycielem", "refs": "Ps 54:1-9"},
-   {"name": "Odcięta poła płaszcza w En-Gedi", "refs": "1Sam 24:2-23"},
+   {"name": "Dawid oszczędza Saula w En-Gedi", "refs": "1Sam 24:2-23"},
    {"name": "Niewinny prosi Boga o sąd", "refs": "Ps 7:1-18", "note": ["pewne: „ze względu na słowa Beniaminity Kusza”, „jeśli temu, kto żyje ze mną w pokoju, odpłaciłem złem” (7,5) – Dawid do Saula: „Dlaczego słuchasz słów… Dawid szuka twojej krzywdy?” (1 Sm 24,10)."]},
    {"name": "Śmierć i pogrzeb Samuela", "refs": "1Sam 25:1"},
    {"name": "Abigail powstrzymuje Dawida", "refs": "1Sam 25:2-44"},
-   {"name": "Włócznia i dzban z obozu Saula", "refs": "1Sam 26:1-25"}
+   {"name": "Dawid po raz drugi oszczędza Saula", "refs": "1Sam 26:1-25"}
   ]},
   {"name": "Dawid wśród Filistynów, Saul w En-Dor", "stories": [
    {"name": "Dawid osiada w Siklag", "refs": "1Sam 27:1-7"},
@@ -1015,7 +1015,7 @@
    {"name": "Zabójstwo Amnona i ucieczka Absaloma", "refs": "2Sam 13:23-39"},
    {"name": "Kobieta z Tekoa i powrót Absaloma", "refs": "2Sam 14:1-24"},
    {"name": "Uroda i włosy Absaloma", "refs": "2Sam 14:25-27"},
-   {"name": "Podpalone pole Joaba i pojednanie", "refs": "2Sam 14:28-33"}
+   {"name": "Pojednanie Dawida z Absalomem", "refs": "2Sam 14:28-33"}
   ]},
   {"name": "Bunt Absaloma", "stories": [
    {"name": "Absalom zdobywa serca Izraelitów", "refs": "2Sam 15:1-12"},
@@ -1037,7 +1037,7 @@
   ]},
   {"name": "Śmierć Absaloma i powrót Dawida", "stories": [
    {"name": "Bitwa w lesie Efraima", "refs": "2Sam 18:1-8"},
-   {"name": "Absalom zawieszony na dębie", "refs": "2Sam 18:9-32"},
+   {"name": "Śmierć Absaloma", "refs": "2Sam 18:9-32"},
    {"name": "Płacz króla nad synem", "refs": "2Sam 19:1"},
    {"name": "Joab upomina króla", "refs": "2Sam 19:2-8"},
    {"name": "Powrót króla przez Jordan", "refs": "2Sam 19:9-41"}
@@ -1082,7 +1082,7 @@
    {"name": "Hojność książąt i ludu", "refs": "1Chr 29:6-9"},
    {"name": "Błogosławieństwo Dawida przed zgromadzeniem", "refs": "1Chr 29:10-19"},
    {"name": "Uczta i drugie namaszczenie Salomona", "refs": "1Chr 29:20-22"},
-   {"name": "Abiszag ogrzewa starego króla", "refs": "1Kgs 1:1-4"},
+   {"name": "Starość Dawida", "refs": "1Kgs 1:1-4"},
    {"name": "Adoniasz ogłasza się królem", "refs": "1Kgs 1:5-10"},
    {"name": "Salomon namaszczony w Gichonie", "refs": "1Kgs 1:11-50"},
    {"name": "Adoniasz u rogów ołtarza", "refs": "1Kgs 1:51-53"},
@@ -1299,9 +1299,9 @@
    {"name": "Uzdrowiona woda i szydercy z Betel", "refs": "2Kgs 2:19-22; 2Kgs 2:23-25"},
    {"name": "Dzban oliwy dla wdowy", "refs": "2Kgs 4:1-7"},
    {"name": "Szunamitka i jej syn", "refs": "2Kgs 4:8-37"},
-   {"name": "Strawa w kotle i chleby dla stu", "refs": "2Kgs 4:38-41; 2Kgs 4:42-44"},
+   {"name": "Uzdrowiona strawa i rozmnożenie chleba", "refs": "2Kgs 4:38-41; 2Kgs 4:42-44"},
    {"name": "Naaman i Gehazi", "refs": "2Kgs 5:1-27"},
-   {"name": "Pływające żelazo siekiery", "refs": "2Kgs 6:1-7"},
+   {"name": "Elizeusz odzyskuje zgubioną siekierę", "refs": "2Kgs 6:1-7"},
    {"name": "Aramejczycy porażeni ślepotą", "refs": "2Kgs 6:8-23"},
    {"name": "Głód w oblężonej Samarii i ucieczka Aramu", "refs": "2Kgs 6:24-33; 2Kgs 7:1-2; 2Kgs 7:3-20"},
    {"name": "Szunamitka odzyskuje ziemię", "refs": "2Kgs 8:1-6"},
@@ -1385,7 +1385,7 @@
    {"name": "Lament nad Moabem", "refs": "Isa 15:1-16:14", "note": ["śmierć Achaza przed objęciem władzy przez Hiskiasza (2 Krl 18,1: w 3. roku Ozeasza), a więc przed upadkiem Samarii (6. rok Hiskiasza); wyrocznie z Iz 13–16 wypowiedziane „w roku śmierci króla Achaza” (14,28)."]}
   ]},
   {"name": "Hiskiasz w Judzie, król Ozeasz w Izraelu", "stories": [
-   {"name": "Hiskiasz kruszy miedzianego węża", "refs": "2Kgs 18:1-8; 2Chr 29:1-2"},
+   {"name": "Hiskiasz królem: koniec bałwochwalstwa", "refs": "2Kgs 18:1-8; 2Chr 29:1-2"},
    {"name": "Oczyszczenie świątyni za Hiskiasza", "refs": "2Chr 29:3-36", "note": ["2 Krn 29,3: „w pierwszym roku swego panowania, w pierwszym miesiącu” – oczyszczenie świątyni, Pascha w drugim miesiącu tego roku (30,2) i reforma (31) należą do 1. roku Hiskiasza, przed upadkiem Samarii w jego 6. roku (2 Krl 18,10)."]},
    {"name": "Wielka Pascha w Jerozolimie", "refs": "2Chr 30:1-27", "note": ["2 Krn 29,3: „w pierwszym roku swego panowania, w pierwszym miesiącu” – oczyszczenie świątyni, Pascha w drugim miesiącu tego roku (30,2) i reforma (31) należą do 1. roku Hiskiasza, przed upadkiem Samarii w jego 6. roku (2 Krl 18,10)."]},
    {"name": "Dziesięciny i dary dla kapłanów", "refs": "2Chr 31:1; 2Chr 31:2-21", "note": ["2 Krn 29,3: „w pierwszym roku swego panowania, w pierwszym miesiącu” – oczyszczenie świątyni, Pascha w drugim miesiącu tego roku (30,2) i reforma (31) należą do 1. roku Hiskiasza, przed upadkiem Samarii w jego 6. roku (2 Krl 18,10)."]},
@@ -1735,7 +1735,7 @@
    {"name": "Chwilowe odejście Chaldejczyków", "refs": "Jer 37:1-10", "note": ["zasada: proroctwo tam, gdzie zostało wypowiedziane – Jr 37,5: wojsko faraona wyruszyło, Chaldejczycy odstąpili od Jerozolimy – w czasie oblężenia."]},
    {"name": "Odwołane wyzwolenie niewolników", "refs": "Jer 34:8-22"},
    {"name": "Jeremiasz w lochu i tajna rozmowa", "refs": "Jer 37:11-16; Jer 37:17-21", "note": ["Jr 34,21–22: wojsko Babilonu „odstąpiło” – niewolników zabrano z powrotem w czasie przerwy w oblężeniu; Jeremiasz uwięziony, gdy chciał wtedy wyjść z miasta (37,11–21)."]},
-   {"name": "Krokodyl z Nilu i złamane ramię faraona", "refs": "Ezek 29:1-16; Ezek 30:20-26"},
+   {"name": "Wyrok na faraona i Egipt", "refs": "Ezek 29:1-16; Ezek 30:20-26"},
    {"name": "Faraon jak ścięty cedr", "refs": "Ezek 31:1-18"},
    {"name": "Spisz słowa o powrocie", "refs": "Jer 30:1-3", "note": ["Księga pocieszenia (Jr 30–31) bez daty – razem z Jr 32–33 (10. rok Sedekiasza) o tej samej zapowiedzi „odmienię los” (30,3; 32,44; 33,7)."]},
    {"name": "Czas udręki Jakuba i ocalenie", "refs": "Jer 30:4-24", "note": ["Księga pocieszenia (Jr 30–31) bez daty – razem z Jr 32–33 (10. rok Sedekiasza) o tej samej zapowiedzi „odmienię los” (30,3; 32,44; 33,7)."]},
@@ -1776,7 +1776,7 @@
    {"name": "Zamordowanie Gedaliasza", "refs": "2Kgs 25:22-24; 2Kgs 25:25-26; Jer 40:7-12; Jer 40:13-41:10; Jer 41:11-15; Jer 41:16-18"},
    {"name": "Rada PANA: zostańcie w ziemi", "refs": "Jer 42:1-22"},
    {"name": "Ucieczka wbrew słowu proroka", "refs": "Jer 43:1-7"},
-   {"name": "Kamienie w Tachpanches", "refs": "Jer 43:8-13"},
+   {"name": "Zapowiedź najazdu Babilonu na Egipt", "refs": "Jer 43:8-13"},
    {"name": "Królowa niebios i wyrok na uchodźców", "refs": "Jer 44:1-29; Jer 44:30"}
   ]},
   {"name": "Ezechiel po upadku Jerozolimy (Ez 32–39)", "stories": [
@@ -2024,7 +2024,7 @@
    {"name": "Wyznanie Piotra i zapowiedź męki", "refs": "Mark 8:27-30; Matt 16:13-20; Luke 9:18-20; Mark 8:31-33; Mark 8:34-9:1; Matt 16:21; Matt 16:22-23; Matt 16:24-28; Luke 9:21-22; Luke 9:23-27"},
    {"name": "Przemienienie, Mojżesz i Eliasz", "refs": "Mark 9:2-8; Mark 9:9-13; Matt 17:1-9; Matt 17:10-13; Luke 9:28-36"},
    {"name": "Opętany chłopiec i druga zapowiedź męki", "refs": "Mark 9:14-29; Matt 17:14-21; Luke 9:37-43; Mark 9:30-32; Matt 17:22-23; Luke 9:44-45"},
-   {"name": "Moneta w pysku ryby", "refs": "Matt 17:24-27"}
+   {"name": "Podatek na świątynię", "refs": "Matt 17:24-27"}
   ]},
   {"name": "Nauka o wielkości i przebaczaniu", "stories": [
    {"name": "Kto jest największy", "refs": "Mark 9:33-37; Matt 18:1-6; Luke 9:46-48; Mark 9:38-41; Luke 9:49-50"},
