@@ -39,16 +39,24 @@ for(const info of translations){
   const all = [];
   for(const b of tr.bookIds) for(let c = 1; c <= tr.chapters(b); c++) for(let v = 1; v <= tr.last(b, c); v++) if(tr.exists(b, c, v)) all.push(`${b}.${c}.${v}`);
   const mapped = tr.mapChronology(chron);
-  console.log(`${info.id}: ${all.length} wersetów, chronologia: ${mapped.entries.length} pasaży, dołączono ${mapped.attached.length}, duplikaty ${mapped.duplicates}, nagłówki ${tr.headSet.size}`);
+  console.log(`${info.id}: ${all.length} wersetów, chronologia: ${mapped.threads.length} wątków, ${mapped.stories.length} historii, dołączono ${mapped.attached.length}, wspólne dla dwóch historii ${mapped.shared.length} ${mapped.shared.slice(0, 6).join(' ')}, nagłówki ${tr.headSet.size}`);
 
+  // historie: każdy werset przekładu w dokładnie jednej historii
+  const inStories = new Map();
+  for(const st of mapped.stories) for(const u of st.units) for(const v of tr.versesOf(u)){ const k = `${u[0]}.${u[1]}.${v}`; inStories.set(k, (inStories.get(k) || 0) + 1); }
+  const sMiss = all.filter(k => !inStories.has(k)), sDup = [...inStories].filter(([, n]) => n > 1);
+  if(sMiss.length || sDup.length){ failed++; console.error(`   BŁĄD historii: brak ${sMiss.length} ${sMiss.slice(0, 3)}, podwójne ${sDup.length}`); }
+  else console.log(`   OK  historie: każdy werset w dokładnie jednej z ${mapped.stories.filter(s => s.units.length).length} historii`);
   const cases = [
-    {name: 'chron/words', chron: mapped.entries, mode: 'words', parts: [tr.bookIds]},
-    {name: 'chron/chapters', chron: mapped.entries, mode: 'chapters', parts: [tr.bookIds]},
+    {name: 'chron/words', chron: mapped, mode: 'words', parts: [tr.bookIds]},
+    {name: 'chron/ST+NT', chron: mapped, mode: 'words', parts: [tr.bookIds.filter(b => b < 40), tr.bookIds.filter(b => b >= 40)]},
+    {name: 'chron/chapters', chron: mapped, mode: 'chapters', parts: [tr.bookIds]},
+    {name: 'seq/historie', chron: null, storyOf: mapped.storyOf, mode: 'words', parts: [tr.bookIds]},
     {name: 'seq/3 czytania/hard', chron: null, mode: 'words', mix: 'hard', parts: [tr.bookIds.filter(b => b < 18 || (b > 22 && b < 40)), tr.bookIds.filter(b => b >= 18 && b <= 22), tr.bookIds.filter(b => b >= 40)]},
     {name: 'seq/verses/heads', chron: null, mode: 'verses', useHeads: true, parts: [tr.bookIds]},
   ];
   for(const cs of cases){
-    const plan = buildPlan({tr, parts: cs.parts.map((books, i) => ({name: 'C' + i, books})), chron: cs.chron, mode: cs.mode,
+    const plan = buildPlan({tr, parts: cs.parts.map((books, i) => ({name: 'C' + i, books})), chron: cs.chron, storyOf: cs.storyOf || null, mode: cs.mode,
       mix: cs.mix || 'soft', useHeads: !!cs.useHeads, noSplitCh: true, dates: days(365), weekdays: new Set([0, 1, 2, 3, 4])});
     const seen = new Map();
     for(const r of plan.rows) if(r.units) for(const us of r.units) for(const u of us) for(const v of tr.versesOf(u)){
@@ -60,7 +68,7 @@ for(const info of translations){
     console.log(`   ${ok ? 'OK ' : 'BŁĄD'} ${cs.name}: ${seen.size}/${all.length}` + (missing.length ? ` brak ${missing.length} np. ${missing.slice(0, 3)}` : '') + (dup.length ? ` podwójne ${dup.length}` : ''));
   }
   const f = new RefFormatter(canon, tr, {abbr: 'pl', style: 'colon'});
-  const plan = buildPlan({tr, parts: [{name: 'x', books: tr.bookIds}], chron: mapped.entries, mode: 'words', mix: 'off', useHeads: false, noSplitCh: true, dates: days(3), weekdays: new Set([0,1,2,3,4,5,6])});
+  const plan = buildPlan({tr, parts: [{name: 'x', books: tr.bookIds}], chron: mapped, mode: 'words', mix: 'off', useHeads: false, noSplitCh: true, dates: days(3), weekdays: new Set([0,1,2,3,4,5,6])});
   console.log('   przykład:', plan.rows.map(r => f.dayText(r.units[0])).join(' | ').slice(0, 160));
 }
 if(failed){ console.error(`\n${failed} przypadków z błędem`); process.exit(1); }

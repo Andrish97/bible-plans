@@ -1,5 +1,22 @@
-import json,sys,re; sys.path.insert(0,'/tmp/claude-0/tyn'); from e2o import bv
-S=json.load(open('/tmp/claude-0/tyn/stories.json')); D=json.load(open('/tmp/claude-0/tyn/decisions.json'))
+"""Chronologia historiami: historie z planu Tyndale (sources/chronology/stories.json) + decyzje po przeczytaniu
+tekstu (sources/chronology/decisions.json) -> data/chronology.json (wątki i historie w numeracji wzorca).
+Lokalnie dodatkowo .cache/chronology/structured.json z roboczymi tytułami (do stron przeglądu, page.py).
+
+    python3 tools/chronology/apply_decisions.py
+"""
+import json, os, re, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from common import path, key as _key, expand, compress, OSIS, OSIS_ID
+B = json.load(open(path('sources', 'chronology', 'stories.json'), encoding='utf-8'))['stories']
+D = json.load(open(path('sources', 'chronology', 'decisions.json'), encoding='utf-8'))
+TP = path('.cache', 'chronology', 'titles.json')
+TITLES = json.load(open(TP, encoding='utf-8')) if os.path.exists(TP) else {}
+class bv: OSIS = OSIS; OSIS_ID = OSIS_ID
+S = []
+for st in B:
+    parts = [{'title': TITLES.get(r.split('-')[0] if r.count(':') else r, ''), 'ks': [list(k) for k in expand(r)]} for r in st['parts']]
+    first = parts[0]['ks'][0]
+    S.append({'title': TITLES.get('#' + f'{OSIS[first[0]]} {first[1]}:{first[2]}', st['parts'][0]), 'parts': parts, 'why': list(st['why']), 'days': st['days']})
 def key(r):
     m=re.fullmatch(r'(\S+) (\d+):(\d+)',r); return (bv.OSIS_ID[m[1]],int(m[2]),int(m[3]))
 def owner_map():
@@ -93,6 +110,26 @@ for n,(i,name) in enumerate(threads):
     if m:
         cs=sorted({p['ks'][0][1] for st in S[i:bounds[n+1]] for p in st['parts'] if p['ks'][0][0]==19})
         threads[n]=(i,f'{m[1]} (Ps {comp(cs)})')
-json.dump({'stories':S,'threads':threads},open('/tmp/claude-0/tyn/structured.json','w'),ensure_ascii=False)
+os.makedirs(path('.cache', 'chronology'), exist_ok=True)
+json.dump({'stories': S, 'threads': threads}, open(path('.cache', 'chronology', 'structured.json'), 'w', encoding='utf-8'), ensure_ascii=False)
+# plik aplikacji: wątki -> historie -> zakresy; uwagi tylko przy decyzjach innych niż w planie Tyndale
+PFX = 'ręcznie (nie Tyndale): '
+out = []
+for n, (i, name) in enumerate(threads):
+    sts = []
+    for st in S[i:bounds[n + 1]]:
+        e = {'refs': '; '.join(compress(p['ks'])[0] for p in st['parts'])}
+        notes = [w[len(PFX):] for w in st['why'] if w.startswith(PFX)]
+        if notes: e['note'] = list(dict.fromkeys(notes))
+        sts.append(e)
+    out.append((name, sts))
+check = [tuple(k) for st in S for p in st['parts'] for k in p['ks']]
+if len(check) != len(set(check)): errors.append('werset w dwóch historiach')
+with open(path('data', 'chronology.json'), 'w', encoding='utf-8') as f:
+    f.write('{\n "description": "Chronologia całej Biblii historiami. Wątek = kilka historii czytanych razem; historia = jedno wydarzenie (z relacjami równoległymi) albo jedna jednostka tekstu. Każdy werset wzorca jest dokładnie raz. Plan tnie najchętniej między wątkami, potem między historiami, wewnątrz historii tylko w ostateczności.",\n')
+    f.write(' "source": "Kolejność według planu The One Year Chronological Bible (Tyndale), z decyzjami po przeczytaniu tekstu: sources/chronology/decisions.json. note = powód zmiany względem planu Tyndale.",\n')
+    f.write(' "versification": "org",\n "syntax": "refs: zakresy OSIS rozdział:werset[-[rozdział:]werset] w numeracji wzorca, rozdzielone średnikiem",\n "threads": [\n')
+    f.write(',\n'.join('  {"name": ' + json.dumps(name, ensure_ascii=False) + ', "stories": [\n' + ',\n'.join('   ' + json.dumps(e, ensure_ascii=False) for e in sts) + '\n  ]}' for name, sts in out))
+    f.write('\n ]\n}\n')
 print('BŁĘDY:' if errors else 'bez błędów', *errors, sep='\n  ')
 print('historii:',len(S),'wątków:',len(threads))

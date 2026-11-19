@@ -104,31 +104,41 @@ export class Translation {
   }
 
   /**
-   * Chronologia (numeracja wzorca) -> pasaże w wersetach tego przekładu, przez mapę numeracji.
-   * Gwarancja: każdy istniejący werset przekładu trafia do dokładnie jednego pasażu
-   * (werset połączony z kilkoma wersetami wzorca – do pierwszego z nich; werset bez odpowiednika
-   * we wzorcu – do pasażu poprzedniego wersetu tej samej księgi).
+   * Chronologia historiami (numeracja wzorca) -> historie w wersetach tego przekładu, przez mapę numeracji.
+   * Gwarancja: każdy istniejący werset przekładu należy do dokładnie jednej historii
+   * (werset połączony z kilkoma wersetami wzorca – do pierwszej z nich; werset bez odpowiednika
+   * we wzorcu – do historii poprzedniego wersetu tej samej księgi).
    * @param {object} chron data/chronology.json
-   * @returns {{entries: number[][][], attached: string[], duplicates: number}}
+   * @returns {{threads: {name:string, first:number, count:number}[], stories: {units:number[][], thread:number, refs:string, note?:string[]}[],
+   *   entries: number[][][], storyOf: Map<string, number>, attached: string[], shared: string[], duplicates: number}}
    */
   mapChronology(chron){
-    const owner = new Map();                   // 'b.c.v' przekładu -> indeks pasażu
-    const lists = chron.entries.map(() => []); // indeks pasażu -> [[b,c,v], ...]
-    let duplicates = 0;
-    chron.entries.forEach((entry, i) => {
-      for(const part of entry.split(';')){
-        for(const [b, c, v] of this.orgRange(part)){
-          if(!this.has(b)) continue;
-          for(const k of this.fromOrg(b, c, v)){
-            const key = k.join('.');
-            if(owner.has(key)){ duplicates++; continue; }
-            owner.set(key, i); lists[i].push(k);
+    const owner = new Map();                   // 'b.c.v' przekładu -> indeks historii
+    const meta = [], lists = [], threads = [];
+    const shared = [];                         // wersety przekładu na styku dwóch historii (zostają w pierwszej)
+    chron.threads.forEach((th, t) => {
+      threads.push({name: th.name, first: meta.length, count: th.stories.length});
+      for(const st of th.stories){
+        const i = meta.length;
+        meta.push({thread: t, refs: st.refs, note: st.note});
+        const vs = [];
+        for(const part of st.refs.split(';')){
+          for(const [b, c, v] of this.orgRange(part)){
+            if(!this.has(b)) continue;
+            for(const k of this.fromOrg(b, c, v)){
+              const key = k.join('.');
+              if(owner.has(key)){ if(owner.get(key) !== i) shared.push(`${key}`); continue; }  // kilka wersetów wzorca = jeden werset przekładu
+              owner.set(key, i); vs.push(k);
+            }
           }
         }
+        lists.push(vs);
       }
     });
-    // pokrycie: wersety bez pasażu
-    const attached = [];
+    // pokrycie: wersety przekładu bez historii -> historia poprzedniego (albo następnego) wersetu tej księgi,
+    // w historii stoją zaraz za nim (albo przed nim)
+    const attached = [], after = new Map(), before = new Map();
+    const push = (m, k, x) => { if(!m.has(k)) m.set(k, []); m.get(k).push(x); };
     for(const b of this.bookIds){
       const all = [];
       for(let c = 1; c <= this.chapters(b); c++) for(let v = 1; v <= this.last(b, c); v++) if(this.exists(b, c, v)) all.push([b, c, v]);
@@ -136,27 +146,28 @@ export class Translation {
       for(let i = 0; i < all.length; i++){
         if(owner.has(key(all[i]))) continue;
         let j = i - 1; while(j >= 0 && !owner.has(key(all[j]))) j--;
-        let target;
-        if(j >= 0) target = owner.get(key(all[j]));
-        else { let k = i + 1; while(k < all.length && !owner.has(key(all[k]))) k++; target = k < all.length ? owner.get(key(all[k])) : -1; }
-        if(target === -1){ lists.push([]); target = lists.length - 1; }
-        owner.set(key(all[i]), target); lists[target].push(all[i]);
-        attached.push(`${b}.${all[i][1]}.${all[i][2]}`);
+        if(j >= 0){ owner.set(key(all[i]), owner.get(key(all[j]))); push(after, key(all[j]), all[i]); }
+        else {
+          let k = i + 1; while(k < all.length && !owner.has(key(all[k]))) k++;
+          if(k >= all.length) continue;                   // księga bez żadnej historii
+          owner.set(key(all[i]), owner.get(key(all[k]))); push(before, key(all[k]), all[i]);
+        }
+        attached.push(key(all[i]));
       }
     }
-    // pasaż -> jednostki [b,c,v1,v2] (kolejność ksiąg jak w pasażu, wersety rosnąco)
-    const entries = lists.map(vs => {
-      const bookOrder = [];
-      for(const [b] of vs) if(!bookOrder.includes(b)) bookOrder.push(b);
-      vs.sort((x, y) => bookOrder.indexOf(x[0]) - bookOrder.indexOf(y[0]) || x[1] - y[1] || x[2] - y[2]);
+    // historia -> jednostki [b,c,v1,v2] w kolejności historii (relacje równoległe przeplatane)
+    const stories = lists.map((vs, i) => {
+      const seq = [];
+      const addAfter = k => { for(const x of after.get(k.join('.')) || []){ seq.push(x); addAfter(x); } };
+      for(const k of vs){ for(const x of before.get(k.join('.')) || []) seq.push(x); seq.push(k); addAfter(k); }
       const units = [];
-      for(const [b, c, v] of vs){
+      for(const [b, c, v] of seq){
         const u = units[units.length - 1];
         if(u && u[0] === b && u[1] === c && this.nextVerse(b, c, u[3]) === v) u[3] = v;
         else units.push([b, c, v, v]);
       }
-      return units;
-    }).filter(u => u.length);
-    return {entries, attached, duplicates};
+      return {...meta[i], units};
+    });
+    return {threads, stories, entries: stories.map(s => s.units), storyOf: owner, attached, shared, duplicates: shared.length};
   }
 }

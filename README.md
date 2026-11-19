@@ -46,7 +46,7 @@ są tylko lokalnie i ignorowane przez git.
 | `translations/<id>/structure.json` | budowa przekładu: liczba słów w każdym wersecie (`null` = wersetu nie ma). Na tym liczony jest plan |
 | `versification/org.json` | **wzorzec**: numeracja oryginału (Biblia Hebrajska dla ST, wydania greckie dla NT) – liczba wersetów w rozdziałach |
 | `versification/<id>.json` | **mapa** numeracji przekładu na wzorzec |
-| `chronology.json` | uniwersalna kolejność chronologiczna (1749 pasaży) w numeracji wzorca |
+| `chronology.json` | chronologia historiami: 270 wątków, 1935 historii, każdy werset wzorca dokładnie raz (numeracja wzorca) |
 | `headings/<zestaw>.json` | początki sekcji w numeracji wzorca (bez tytułów): `bw` (wydanie BW), `snpd` (SNP dosłowny) |
 
 ### Mapa numeracji
@@ -86,6 +86,21 @@ przeczytane i rozstrzygnięte ręcznie (`MANUAL` w tym pliku).
 
 Opcja „Zaczynaj dzień od nagłówka sekcji” jest dostępna tylko w przekładach z nagłówkami.
 
+### Chronologia historiami
+
+`data/chronology.json` to ciąg **wątków**, a w każdym **historie**. Historia to jedno wydarzenie razem z relacjami
+równoległymi (np. Samuel–Kroniki, cztery Ewangelie) albo jedna całość tekstu (psalm, mowa, rozdział listu).
+Plan chronologiczny kończy dzień najchętniej między wątkami, potem między historiami, a wewnątrz historii tylko
+w ostateczności. W planie „po kolei” opcja „Nie dziel historii” używa tych samych historii.
+
+Historie są zapisane raz, we wzorcu, i trafiają na każdy przekład przez jego mapę numeracji (`Translation.mapChronology`):
+każdy werset przekładu należy do dokładnie jednej historii (sprawdza `tools/check.mjs`).
+
+Kolejność pochodzi z planu *The One Year Chronological Bible* (Tyndale, `sources/chronology/tyndale_plan.json`),
+a historie i zmiany są decyzjami po przeczytaniu tekstu (`sources/chronology/decisions.json`, z powodem każdej zmiany
+i zasadami: proroctwo stoi tam, gdzie zostało wypowiedziane; psalm przy historii, z którą łączy go tytuł albo treść;
+list tam, gdzie został napisany).
+
 ### Uwagi o modułach źródłowych
 
 - **BW**: moduł nie ma 44 wersetów wzorca (m.in. Lb 17:14-28, Pwt 28:69, 1 Krn 5:27-41, Ez 21:33-37, Pnp 7:14),
@@ -105,6 +120,9 @@ node tools/check_sw.mjs                   # czy sw.js zapisuje offline wszystkie
 python3 tools/convert_mybible.py          # moduły -> data/translations/ (+ tekst lokalnie w .cache/)
 python3 tools/build_versification.py      # mapy -> data/versification/, nagłówki -> data/headings/;
                                           # raport do przeczytania: .cache/versification_report.txt
+
+# chronologia: historie (sources/chronology/stories.json) + decyzje -> data/chronology.json
+python3 tools/chronology/apply_decisions.py
 ```
 
 Testy (`check.mjs`, `check_sw.mjs` i kontrolę, że w repozytorium nie ma tekstu) uruchamia GitHub Actions

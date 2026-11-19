@@ -273,6 +273,11 @@ function refreshControls(parts){
   const byCh = val('unit') === 'chapters';
   ctrl('noSplitCh').disabled = byCh;
   $('noSplitWrap').classList.toggle('off', byCh);
+  const storyOff = byCh || val('order') === 'chron';
+  ctrl('noSplitStory').disabled = storyOff;
+  $('noSplitStoryWrap').classList.toggle('off', storyOff);
+  $('storyHint').hidden = val('order') !== 'chron' || byCh;
+  $('storyHint').textContent = 'W planie chronologicznym historie i wątki są zawsze brane pod uwagę.';
   const headsOk = tr.hasHeadings && !byCh;
   ctrl('useHeads').disabled = !headsOk;
   $('useHeadsWrap').classList.toggle('off', !headsOk);
@@ -303,7 +308,8 @@ function update(){
   const chron = val('order') === 'chron';
   const plan = buildPlan({
     tr, parts, dates,
-    chron: chron ? tr.chronology.entries : null,
+    chron: chron ? tr.chronology : null,
+    storyOf: !chron && val('noSplitStory') ? tr.chronology.storyOf : null,
     mode: val('unit'), mix: val('noMixOn') ? val('noMixMode') : 'off',
     useHeads: tr.hasHeadings && val('useHeads'), noSplitCh: val('noSplitCh'),
     weekdays: weekdays(),
@@ -324,7 +330,7 @@ function update(){
   const filled = S.view.rows.filter(r => r.texts).length;
   const stats = [`Dni z czytaniem: ${filled} z ${n}`];
   plan.parts.forEach((p, i) => stats.push(`${P > 1 ? p.name + ': ' : ''}${plan.totals[i].toLocaleString('pl-PL')} wersetów`));
-  if(chron && tr.chronology.attached.length) stats.push(`chronologia dopasowana do ${tr.info.short} (${tr.chronology.attached.length} wers. dołączonych do sąsiednich pasaży)`);
+  if(chron && tr.chronology.attached.length) stats.push(`chronologia dopasowana do ${tr.info.short} (${tr.chronology.attached.length} wers. dołączonych do sąsiednich historii)`);
   $('info').textContent = stats.join(' · ');
   const long = dt => dt.toLocaleDateString('pl-PL', {day: 'numeric', month: 'long', year: 'numeric'});
   S.view.subtitleShort = `${tr.info.short}${chron ? ' · chronologicznie' : ''}`;

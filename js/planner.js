@@ -15,19 +15,19 @@ function weight(tr, u, mode){
 }
 
 /**
- * Grupy do podziału: {u: [jednostki], link: id pasażu albo null}.
- * Cięcie wewnątrz jednego pasażu chronologii jest karane.
+ * Grupy do podziału: {u: [jednostki], link: historia albo null, thread: wątek albo null}.
+ * Chronologia: kolejność historii; cięcie wewnątrz historii jest mocno karane, między historiami
+ * jednego wątku – lekko, między wątkami – wcale.
+ * Po kolei: kolejność ksiąg; jeśli podano storyOf (werset -> historia), cięcie wewnątrz historii też jest karane.
  */
-export function buildGroups(tr, books, chronEntries, mode){
+export function buildGroups(tr, books, chron, mode, storyOf){
   const set = new Set(books);
   const groups = [];
-  if(chronEntries){
-    // w trybie rozdziałów jednostką jest kawałek rozdziału należący do pasażu
-    let link = 0;
-    for(const entry of chronEntries){
-      link++;
-      for(const p of entry) if(set.has(p[0])) for(const e of explode(tr, p, mode)) groups.push({u: [e], link});
-    }
+  if(chron){
+    // w trybie rozdziałów jednostką jest kawałek rozdziału należący do historii
+    chron.stories.forEach((st, link) => {
+      for(const p of st.units) if(set.has(p[0])) for(const e of explode(tr, p, mode)) groups.push({u: [e], link, thread: st.thread});
+    });
     return groups;
   }
   let order = books.slice().sort((a, b) => a - b);
@@ -36,10 +36,11 @@ export function buildGroups(tr, books, chronEntries, mode){
     for(const b of order) if(b >= 19 && b <= 22) lastW = b;
     if(lastW){ order = order.filter(b => b !== 18); order.splice(order.indexOf(lastW) + 1, 0, 18); }
   }
+  const story = storyOf && mode !== 'chapters' ? e => storyOf.get(`${e[0]}.${e[1]}.${e[2]}`) ?? null : () => null;
   for(const b of order){
     for(let c = 1; c <= tr.chapters(b); c++){
       if(!tr.last(b, c)) continue;
-      for(const e of explode(tr, tr.chapterUnit(b, c), mode)) groups.push({u: [e], link: null});
+      for(const e of explode(tr, tr.chapterUnit(b, c), mode)) groups.push({u: [e], link: story(e), thread: null});
     }
   }
   return groups;
@@ -60,7 +61,8 @@ export function splitGroups(tr, groups, K, mode, opt){
   const cum = []; let t = 0;
   for(const g of groups){ t += groupWeight(tr, g, mode); cum.push(t); }
   const total = t || 1;
-  const PEN = 0.25 * total / K;          // cięcie wewnątrz pasażu: ćwierć dnia
+  const PEN = 0.25 * total / K;          // cięcie wewnątrz historii: ćwierć dnia
+  const THREAD_PEN = 0.06 * total / K;   // cięcie między historiami jednego wątku
   const HEADS_PEN = total / K;           // cięcie poza nagłówkiem: cały dzień
   const CH_PEN = 0.6 * total / K;        // cięcie w środku rozdziału
   const NOMIX_PEN = 0.5 * total / K;     // miękkie „nie łącz ksiąg”: cięcie w środku księgi
@@ -69,7 +71,8 @@ export function splitGroups(tr, groups, K, mode, opt){
   const headCut = e => e < G && tr.isHeading(first(e)[0], first(e)[1], first(e)[2]);
   const sameBookCut = e => e < G && lastU(e - 1)[0] === first(e)[0];
   const chapCut = e => e < G && lastU(e - 1)[0] === first(e)[0] && lastU(e - 1)[1] === first(e)[1];
-  const inside = e => e < G && groups[e - 1].link !== null && groups[e - 1].link === groups[e].link;
+  const inside = e => e < G && groups[e - 1].link != null && groups[e - 1].link === groups[e].link;
+  const inThread = e => e < G && groups[e - 1].thread != null && groups[e - 1].thread === groups[e].thread;
   // kary za cięcie po każdej granicy liczone raz
   // rozdział: ciąg grup z tego samego rozdziału; nie zostawiamy 1–3 wersetów, a krótkich rozdziałów nie dzielimy
   const MIN_PART = 4, SHORT_CH = 30;
@@ -78,7 +81,7 @@ export function splitGroups(tr, groups, K, mode, opt){
   for(let i = 0; i < G; ){ let j = i; while(j < G && key(j) === key(i)) j++; for(let k = i; k < j; k++){ runStart[k] = i; runEnd[k] = j; } i = j; }
   const pen = new Float64Array(G + 1);
   for(let e = 1; e < G; e++){
-    pen[e] = (inside(e) ? PEN : 0) + (useHeads && !headCut(e) ? HEADS_PEN : 0) + (noSplitCh && chapCut(e) ? CH_PEN : 0) + (softMix && sameBookCut(e) ? NOMIX_PEN : 0);
+    pen[e] = (inside(e) ? PEN : inThread(e) ? THREAD_PEN : 0) + (useHeads && !headCut(e) ? HEADS_PEN : 0) + (noSplitCh && chapCut(e) ? CH_PEN : 0) + (softMix && sameBookCut(e) ? NOMIX_PEN : 0);
     if(chapCut(e)){
       const left = e - runStart[e - 1], right = runEnd[e] - e, len = runEnd[e] - runStart[e - 1];
       if(left < MIN_PART || right < MIN_PART || (noSplitCh && len <= SHORT_CH)) pen[e] = Infinity;
@@ -170,7 +173,7 @@ export function splitBookSafe(tr, groups, K, mode, opt){
   for(const bl of blocks){
     if(bl.big) days.push(...splitGroups(tr, bl.segs[0].groups, bl.d, mode, {...opt, softMix: false}));
     else {
-      const pseudo = bl.segs.map(s => ({u: s.groups.flatMap(g => g.u), link: null}));
+      const pseudo = bl.segs.map(s => ({u: s.groups.flatMap(g => g.u), link: null, thread: null}));
       days.push(...splitGroups(tr, pseudo, bl.d, mode, {}));
     }
   }
@@ -182,7 +185,8 @@ export function splitBookSafe(tr, groups, K, mode, opt){
  * @param {object} p
  * @param {import('./bible.js').Translation} p.tr
  * @param {{name:string, books:number[]}[]} p.parts  czytania
- * @param {number[][][]|null} p.chron               pasaże chronologii (dopasowane) albo null = po kolei
+ * @param {object|null} p.chron                     chronologia dopasowana do przekładu (tr.chronology) albo null = po kolei
+ * @param {Map<string,number>|null} p.storyOf       po kolei: werset -> historia (nie dziel historii) albo null
  * @param {'words'|'verses'|'chapters'} p.mode
  * @param {'off'|'soft'|'hard'} p.mix
  * @param {boolean} p.useHeads
@@ -197,7 +201,7 @@ export function buildPlan(p){
   const K = slots.length;
   const opt = {useHeads: p.useHeads && mode !== 'chapters', noSplitCh: p.noSplitCh && mode !== 'chapters', softMix: !chron && p.mix === 'soft'};
   const perPart = parts.map(pt => {
-    const groups = buildGroups(tr, pt.books, chron, mode);
+    const groups = buildGroups(tr, pt.books, chron, mode, chron ? null : p.storyOf);
     return (!chron && p.mix === 'hard' && splitBookSafe(tr, groups, K, mode, opt)) || splitGroups(tr, groups, K, mode, opt);
   });
   const rows = p.dates.map(d => ({date: d, units: null, verses: 0}));

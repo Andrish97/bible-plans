@@ -9,6 +9,7 @@ export const HELP = {
   nie_laczy: 'Odznaczone: dzień może zawierać końcówkę jednej księgi i początek następnej. Tryb miękki: unika takich dni, o ile nie psuje to równego podziału. Tryb twardy: dzień to fragment jednej księgi albo kilka całych krótkich ksiąg. Tylko przy kolejności „po kolei”.',
   podzial: 'Po długości tekstu: dni wyrównane liczbą słów w wybranym przekładzie. Po wersetach: liczbą wersetów. Po rozdziałach: liczbą rozdziałów (dni nigdy nie dzielą rozdziału).',
   nie_dziel: 'Dzień kończy się na granicy rozdziału, o ile nie psuje to równego podziału. Krótkich rozdziałów (do 30 wersetów) nie dzielimy wcale, a przy cięciu nigdy nie zostaje kawałek 1–3 wersetów.',
+  historie: 'Dzień nie kończy się w środku historii (jednego wydarzenia albo jednej całości tekstu), o ile nie psuje to równego podziału. Historie są wspólne dla wszystkich przekładów – przenoszone przez mapę numeracji. W planie chronologicznym działa zawsze, razem z wątkami: dzień kończy się najchętniej między wątkami, potem między historiami.',
   naglowki: 'Dzień zaczyna się od nagłówka sekcji, o ile nie rozjeżdża to za bardzo równego podziału. Dostępne tylko w przekładach z nagłówkami (BW, SNP, SNPD).',
   kalendarz: 'Data startu to pierwszy dzień planu. Liczba dni (1–800) to długość planu w dniach kalendarzowych.',
   dni: 'Dni tygodnia, w które są czytania. Np. Pn–Pt zostawia weekend jako bufor na nadrabianie.',

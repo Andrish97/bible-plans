@@ -1,6 +1,7 @@
-import json,html,sys
-D=json.load(open('/tmp/claude-0/tyn/structured.json')); S=D['stories']; T=D['threads']
-PL={b['id']:b['abbr']['pl'] for b in json.load(open('/home/user/bible-plans/data/books.json'))['books']}
+import json,html,sys,os
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from common import path
+D=json.load(open(path('.cache','chronology','structured.json'),encoding='utf-8')); S=D['stories']; T=D['threads']
+PL={b['id']:b['abbr']['pl'] for b in json.load(open(path('data','books.json'),encoding='utf-8'))['books']}
 def rng(ks):
     a,b=ks[0],ks[-1]
     if a==b: return f"{PL[a[0]]} {a[1]},{a[2]}"
@@ -18,7 +19,7 @@ def build(t_from,t_to,part,subtitle,out):
             badge=''.join(f'<span class="tag{" man" if w.startswith("ręcznie") else ""}">{html.escape(w)}</span>' for w in sorted(set(s['why'])))
             items.append(f'<li><div class="st"><span class="t">{html.escape(s["title"])}</span><span class="n">{size(s)}</span></div><div class="r">{html.escape(refs)}</div>{("<div class=tags>"+badge+"</div>") if badge else ""}</li>')
         th.append(f'<details><summary><span class="num">{n+1}</span><span class="name">{html.escape(name)}</span><span class="meta">{len(sts)} hist. · {v} w.</span></summary><ol>{"".join(items)}</ol></details>')
-    css=open('/tmp/claude-0/tyn/page.css').read()
+    css=open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'page.css'),encoding='utf-8').read()
     page=f'''<title>Chronologia historiami</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Inter:wght@400;500;600&display=swap">

@@ -1,5 +1,5 @@
 import re,sys
-sys.path.insert(0,'/home/user/bible-plans/tools'); import build_versification as bv
+import os; ROOT=os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..')); sys.path.insert(0,os.path.join(ROOT,'tools')); import build_versification as bv
 def expand_vrs(ref):
     m=re.fullmatch(r'(\w+) (\d+):(\d+)(?:-(\d+))?',ref)
     if not m or m[1] not in bv.PT: return None

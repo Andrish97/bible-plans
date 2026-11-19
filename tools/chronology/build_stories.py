@@ -1,15 +1,15 @@
-import json,sys,re; sys.path.insert(0,'/tmp/claude-0/tyn'); import parse as P
+import json,sys,re; import os; ROOT=os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..')); sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import parse_plan as P
 from e2o import E2O, bv
-blocks,_,_=P.parse_lines(open('/tmp/claude-0/tyn/walk.raw.txt',encoding='utf-8').read().splitlines(),P.bv.ENG,True)
+blocks,_,_=P.parse_lines(open(os.path.join(ROOT,'.cache','walk.raw.txt'),encoding='utf-8').read().splitlines(),P.bv.ENG,True)
 blocks=sorted(blocks,key=lambda x:x[0])
 cache={}
 def V(k):
     b,c,v=k
-    if b not in cache: cache[b]=json.load(open(f'/home/user/bible-plans/.cache/text/snpd/{b:02d}.json'))['chapters']
+    if b not in cache: cache[b]=json.load(open(f'{ROOT}/.cache/text/snpd/{b:02d}.json'))['chapters']
     d=cache[b]
     if c>len(d): return None
     x=[y for y in d[c-1]['verses'] if y['v']==v]; return x[0] if x else None
-PL={b['abbr']['pl'].replace(' ',''):b['id'] for b in json.load(open('/home/user/bible-plans/data/books.json'))['books']}
+PL={b['abbr']['pl'].replace(' ',''):b['id'] for b in json.load(open(ROOT+'/data/books.json'))['books']}
 def refs_in(text):
     """'(Mt 12:22-32; Łk 11:14-23)' -> zbiór wersetów (b,c,v), na które wskazuje oznaczenie równoległości"""
     m=re.match(r'^\((.*?)\)',text or ''); out=set()
@@ -71,7 +71,7 @@ for o in sorted(ORGSET-set(seq)):
     a=prev or nxt; j=pos[a]+(1 if prev else 0); seq.insert(j,o); day[o]=day[a]
 assert len(seq)==len(set(seq))==len(ORGSET)
 # tekst SNPD jest w numeracji SNPD: wzorzec -> SNPD przez mapę
-mp=json.load(open('/home/user/bible-plans/data/versification/snpd.json'))
+mp=json.load(open(ROOT+'/data/versification/snpd.json'))
 import re as _re
 def keys_of(ref,counts):
     m=_re.fullmatch(r'(\S+) (\d+):(\d+)(?:-(?:(\d+):)?(\d+))?',ref); b=bv.OSIS_ID[m[1]]; c1,v1=int(m[2]),int(m[3])
@@ -80,7 +80,7 @@ def keys_of(ref,counts):
     for c in range(c1,c2+1):
         for v in range(v1 if c==c1 else 1,(v2 if c==c2 else counts[b][c-1])+1): out.append((b,c,v))
     return out
-SN={int(k):[len(x) for x in v] for k,v in json.load(open('/home/user/bible-plans/data/translations/snpd/structure.json'))['books'].items()}
+SN={int(k):[len(x) for x in v] for k,v in json.load(open(ROOT+'/data/translations/snpd/structure.json'))['books'].items()}
 O2S={}
 for o,t in mp['links']:
     T=keys_of(t,SN)
@@ -127,7 +127,7 @@ for st in stories:
     st['days']=sorted({day[k] for p in st['parts'] for k in p['ks']})
 for st in stories:
     for p in st['parts']: p['par']=sorted(p['par'])
-json.dump(stories,open('/tmp/claude-0/tyn/stories.json','w'),ensure_ascii=False)
+json.dump(stories,open(os.path.join(ROOT,'.cache','chronology','stories_full.json'),'w'),ensure_ascii=False)
 n=sum(len(p['ks']) for st in stories for p in st['parts'])
 print('historii:',len(stories),'wersetów:',n,'| historii rozciągniętych na >1 dzień Tyndale:',sum(1 for st in stories if len(st['days'])>1))
 
@@ -183,6 +183,6 @@ while i<len(stories):
 for st in stories:
     st['days']=sorted({day[k] for p in st['parts'] for k in p['ks']})
     for p in st['parts']: p['par']=sorted(p['par']) if isinstance(p['par'],set) else p['par']
-json.dump(stories,open('/tmp/claude-0/tyn/stories.json','w'),ensure_ascii=False)
+json.dump(stories,open(os.path.join(ROOT,'.cache','chronology','stories_full.json'),'w'),ensure_ascii=False)
 from collections import Counter
 print('fragmenty:',Counter(a for a,_ in log),'| historii:',len(stories),'| wersetów:',sum(len(p['ks']) for st in stories for p in st['parts']))
