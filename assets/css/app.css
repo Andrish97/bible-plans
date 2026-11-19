@@ -68,16 +68,23 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
 .menu li[aria-checked="true"] .chk{visibility:visible}
 
 /* ==== Układ ================================================================ */
-.layout{display:grid;grid-template-columns:400px 1fr;gap:16px;padding:12px 18px;max-width:1500px;margin:0 auto;align-items:start}
+.layout{padding:12px 18px;max-width:1240px;margin:0 auto}
 .layout > *{min-width:0}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+/* ustawienia na całą stronę: sekcje w kolumnach; podgląd jako osobny ekran (#podglad) */
+body:not(.show-preview) #previewPanel{display:none}
+body.show-preview aside.panel{display:none}
+aside.panel{padding:16px 20px 0}
+@media (min-width:760px){
+  aside.panel{column-width:330px;column-gap:28px;column-rule:1px solid var(--line)}
+  aside.panel > fieldset{break-inside:avoid;page-break-inside:avoid;display:block}
+  aside.panel > .warn,aside.panel > .view-bar{column-span:all}
+}
 @media (min-width:901px){
-  html,body{height:100%;overflow:hidden}
-  body{display:flex;flex-direction:column}
-  .layout{flex:1 1 0;min-height:0;width:100%;align-items:stretch}
-  aside.panel{height:100%;min-height:0;overflow:auto}
-  section.panel{height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden}
-  section.panel .table-wrap{flex:1 1 0;min-height:0}
+  body.show-preview{height:100vh;overflow:hidden;display:flex;flex-direction:column}
+  body.show-preview .layout{flex:1 1 0;min-height:0;width:100%;display:flex}
+  body.show-preview section.panel{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+  body.show-preview section.panel .table-wrap{flex:1 1 0;min-height:0}
 }
 
 /* ==== Panel ustawień ======================================================= */
@@ -213,15 +220,18 @@ th .short{display:none}
 .even .bar i{display:block;height:100%;background:var(--accent)}
 .even b{font-size:12px;font-weight:600;color:var(--muted)}
 
-/* ==== Telefon: ustawienia i podgląd na osobnych ekranach ================== */
-.view-btn,.back-btn{display:none}
+/* ==== Przejście między ustawieniami a podglądem ============================ */
+.view-bar{position:sticky;bottom:0;z-index:5;display:flex;justify-content:flex-end;gap:10px;align-items:center;margin:12px -20px 0;padding:10px 20px;background:color-mix(in srgb,var(--card) 92%,transparent);border-top:1px solid var(--line);backdrop-filter:blur(4px)}
+.view-bar .stats{flex:1;min-width:0}
+.view-btn{padding:10px 18px;font-size:14px;box-shadow:var(--shadow)}
+.prev-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.back-btn{padding:6px 12px;font-size:13px}
+.close-btn{width:34px;height:34px;padding:0;font-size:16px;line-height:1}
 @media (max-width:900px){
-  .layout{grid-template-columns:1fr;padding:10px}
+  .layout{padding:10px}
   header p{display:none}
-  .view-btn{display:block;width:100%;margin-top:10px;padding:11px 14px;font-size:14px;position:sticky;bottom:10px;box-shadow:var(--shadow)}
-  .back-btn{display:inline-block;margin-bottom:10px;padding:6px 12px;font-size:13px}
-  body:not(.show-preview) #previewPanel{display:none}
-  body.show-preview aside.panel{display:none}
+  .view-bar .stats{display:none}
+  .view-btn{flex:1}
   .table-wrap{max-height:none}
   .even{display:none}
   td.date{width:auto}

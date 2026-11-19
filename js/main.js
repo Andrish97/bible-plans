@@ -338,6 +338,7 @@ function update(){
   plan.parts.forEach((p, i) => stats.push(`${P > 1 ? p.name + ': ' : ''}${plan.totals[i].toLocaleString('pl-PL')} wersetów`));
   if(chron && tr.chronology.attached.length) stats.push(`chronologia dopasowana do ${tr.info.short} (${tr.chronology.attached.length} wers. dołączonych do sąsiednich historii)`);
   $('info').textContent = stats.join(' · ');
+  $('infoBar').textContent = stats.slice(0, 2).join(' · ');
   const long = dt => dt.toLocaleDateString('pl-PL', {day: 'numeric', month: 'long', year: 'numeric'});
   S.view.subtitleShort = `${tr.info.short}${chron ? ' · chronologicznie' : ''}`;
   S.view.subtitle = `${tr.info.name}${chron ? ' · chronologicznie' : ''} · ${long(dates[0])} – ${long(dates[n - 1])}`;
@@ -411,9 +412,17 @@ function initPwa(){
 
 // ---------------------------------------------------------------- telefon: ustawienia i podgląd jako osobne ekrany
 function initMobile(){
-  const route = () => { document.body.classList.toggle('show-preview', location.hash === '#podglad'); scrollTo(0, 0); };
+  const route = () => {
+    const on = location.hash === '#podglad';
+    document.body.classList.toggle('show-preview', on);
+    scrollTo(0, 0);
+    if(on) document.querySelector('#rows tr.today')?.scrollIntoView({block: 'center'});
+  };
+  const back = () => { if(location.hash === '#podglad') history.back(); else location.hash = ''; };
   $('toPreview').addEventListener('click', () => { location.hash = 'podglad'; });
-  $('toSettings').addEventListener('click', () => { if(location.hash === '#podglad') history.back(); else location.hash = ''; });
+  $('toSettings').addEventListener('click', back);
+  $('closePreview').addEventListener('click', back);
+  addEventListener('keydown', e => { if(e.key === 'Escape' && location.hash === '#podglad' && !document.querySelector('dialog[open]')) back(); });
   addEventListener('hashchange', route);
   route();
 }
