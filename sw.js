@@ -2,7 +2,7 @@
 // Strategia „najpierw pamięć, w tle odświeżenie” (stale-while-revalidate): strona otwiera się od razu,
 // a nowa wersja plików pobiera się w tle i jest używana przy następnym otwarciu.
 // Przy zmianie listy plików podnieś VERSION (tools/check_sw.mjs pilnuje, że lista jest kompletna).
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE = 'plan-biblii-' + VERSION;
 const TRANSLATIONS = ['bw', 'snp', 'snpd', 'ubg', 'nbg', 'tnp'];
 
@@ -11,7 +11,7 @@ const SHELL = [
   'assets/css/app.css', 'assets/css/print.css',
   'assets/favicon.svg', 'assets/apple-touch-icon.png', 'assets/icon-192.png', 'assets/icon-512.png', 'assets/icon-maskable-512.png',
   'js/theme-init.js', 'js/main.js', 'js/dom.js', 'js/data.js', 'js/bible.js', 'js/planner.js', 'js/refs.js', 'js/settings.js', 'js/share.js',
-  'js/ui/select.js', 'js/ui/calendar.js', 'js/ui/theme.js', 'js/ui/help.js', 'js/ui/readings.js', 'js/ui/preview.js',
+  'js/ui/select.js', 'js/ui/calendar.js', 'js/ui/theme.js', 'js/ui/help.js', 'js/ui/readings.js', 'js/ui/preview.js', 'js/ui/chronology.js',
   'js/export/csv.js', 'js/export/print.js', 'js/export/ics.js',
   'data/books.json', 'data/translations.json', 'data/chronology.json', 'data/versification/org.json',
   'data/headings/bw.json', 'data/headings/snpd.json',

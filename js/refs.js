@@ -72,6 +72,12 @@ export class RefFormatter {
   }
 
   /** Wszystkie jednostki jednego czytania w jednym dniu -> tekst. */
+  /** Jednostki w podanej kolejności (np. historia z relacjami równoległymi): kolejne kawałki jednej księgi razem. */
+  seqText(units, sep = '; '){
+    const runs = [];
+    for(const u of units){ const r = runs[runs.length - 1]; if(r && r[0][0] === u[0]) r.push(u); else runs.push([u]); }
+    return runs.map(l => this.bookText(l)).join(sep);
+  }
   dayText(units){
     const order = [], byBook = new Map();
     for(const u of units){

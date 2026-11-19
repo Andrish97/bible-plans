@@ -1331,7 +1331,7 @@
   [
    "Ps 56:1",
    "Ps 34:23",
-   "tytuł: „gdy Filistyni schwytali go w Gat” – pierwsza ucieczka do Gat (1 Sm 21,11–16), ta sama co w Ps 34; Tyndale miał go przy 1 Sm 29."
+   "tytuł: „gdy Filistyni schwytali go w Gat” – pierwsza ucieczka do Gat (1 Sm 21,11–16), ta sama co w Ps 34 – a nie drugi pobyt u Akisza (1 Sm 29)."
   ],
   [
    "Ps 132:1",
@@ -1448,22 +1448,22 @@
   [
    "Luke 22:63",
    "Luke 22:62",
-   "Łk 22,63–65 (żołnierze szydzą z Jezusa w nocy) – w walkthru omyłkowo przy szyderstwach żołnierzy Piłata; trzy pozostałe wydania Tyndale mają je w nocy, obok Mk 14,65 / Mt 26,67–68, a u Łukasza to ciąg dalszy 22,54–62."
+   "Łk 22,63–65 (strażnicy szydzą z Jezusa w nocy) – obok Mk 14,65 i Mt 26,67–68; u Łukasza to ciąg dalszy 22,54–62, a nie szyderstwa żołnierzy Piłata."
   ],
   [
    "1Sam 13:19",
    "1Sam 13:18",
-   "kolejność tekstu przywrócona (Tyndale przestawił w obrębie jednej historii bez powodu chronologicznego): 13,19–22 to wtrącenie narratora o bitwie, która nadchodzi („w dniu bitwy”, 13,22), a 13,23 (oddział idzie do przełęczy Mikmas) prowadzi wprost do 14,1."
+   "kolejność tekstu (przestawienie nie miałoby podstawy chronologicznej): 13,19–22 to wtrącenie narratora o bitwie, która nadchodzi („w dniu bitwy”, 13,22), a 13,23 (oddział idzie do przełęczy Mikmas) prowadzi wprost do 14,1."
   ],
   [
    "2Sam 5:4",
    "2Sam 5:3",
-   "kolejność tekstu przywrócona (Tyndale przestawił w obrębie jednej historii bez powodu chronologicznego): 5,4–5 to podsumowanie panowania Dawida zaraz po namaszczeniu w Hebronie."
+   "kolejność tekstu (przestawienie nie miałoby podstawy chronologicznej): 5,4–5 to podsumowanie panowania Dawida zaraz po namaszczeniu w Hebronie."
   ],
   [
    "2Sam 5:13",
    "2Sam 12:25",
-   "kolejność tekstu przywrócona (Tyndale przestawił w obrębie jednej historii bez powodu chronologicznego): 5,13 (żony i dzieci w Jerozolimie) to wstęp do listy synów 5,14–16, którą Tyndale czyta przy narodzinach Salomona."
+   "kolejność tekstu (przestawienie nie miałoby podstawy chronologicznej): 5,13 (żony i dzieci w Jerozolimie) to wstęp do listy synów 5,14–16, stojącą przy narodzinach Salomona (Salomon jest na tej liście)."
   ],
   [
    "2Chr 5:1",
@@ -1473,7 +1473,7 @@
   [
    "2Chr 11:5",
    "1Kgs 12:32",
-   "2 Krn 11,5–17: lewici uciekają do Judy z powodu kultu cielców (11,14–15), więc po jego opisie (1 Krl 12,25–32); u Tyndale rozrywało ciąg 1 Krl 12,33 → 13,1."
+   "2 Krn 11,5–17: lewici uciekają do Judy z powodu kultu cielców (11,14–15), więc po jego opisie (1 Krl 12,25–32); tak nie rozrywa ciągu 1 Krl 12,33 → 13,1."
   ],
   [
    "2Kgs 15:30",
@@ -1488,12 +1488,12 @@
   [
    "Luke 4:14",
    "<Mark 1:14",
-   "Łk 4,14–15 (powrót do Galilei) to relacja równoległa do Mk 1,14–15 i Mt 4,12–17 – u Tyndale stało przed świadectwem Jana (J 1,19–34) i całym J 2–4."
+   "Łk 4,14–15 (powrót do Galilei) to relacja równoległa do Mk 1,14–15 i Mt 4,12–17."
   ],
   [
    "Matt 11:1",
    "Matt 10:42",
-   "Mt 11,1: „Gdy Jezus skończył dawać wskazania swoim dwunastu uczniom” – zamyka mowę z Mt 10, u Tyndale stało przed nią."
+   "Mt 11,1: „Gdy Jezus skończył dawać wskazania swoim dwunastu uczniom” – zamyka mowę z Mt 10."
   ],
   [
    "Luke 5:1",
@@ -2617,7 +2617,7 @@
    "Jer 37:1",
    "Jer 37:10",
    "Jer 34:7",
-   "zasada: proroctwo tam, gdzie zostało wypowiedziane – Jr 37,5: wojsko faraona wyruszyło, Chaldejczycy odstąpili od Jerozolimy – w czasie oblężenia (Tyndale miał na początku panowania Sedekiasza)."
+   "zasada: proroctwo tam, gdzie zostało wypowiedziane – Jr 37,5: wojsko faraona wyruszyło, Chaldejczycy odstąpili od Jerozolimy – w czasie oblężenia."
   ],
   [
    "Jer 37:11",
@@ -2743,9 +2743,11 @@
   ]
  ],
  "rules": [
-  "Proroctwo stoi tam, gdzie zostało wypowiedziane. Czas ustala teraźniejszość opisana w tekście (do kogo mówi, co się właśnie dzieje), a nie to, co jest zapowiadane. Gdy tekst nie mówi nic o swojej teraźniejszości – zostaje w kolejności księgi.",
-  "Psalm stoi przy historii, z którą łączy go tytuł albo treść (stopień: pewne / prawdopodobne / niepewne); psalmy bez wskazówki – w zbiorach.",
-  "Kolejność tekstu jest zachowana, chyba że chronologia albo relacja równoległa wymaga inaczej."
+  "Kolejność wydarzeń według tekstu: daty, królowie, następstwo zdarzeń. Gdy tekst nie daje podstaw do przestawienia, zostaje kolejność księgi.",
+  "Relacje równoległe tego samego wydarzenia (Samuel–Królewskie–Kroniki, cztery Ewangelie) tworzą jedną historię i czyta się je razem.",
+  "Proroctwo stoi tam, gdzie zostało wypowiedziane. Czas ustala teraźniejszość opisana w tekście (do kogo prorok mówi, co się właśnie dzieje), a nie to, co jest zapowiadane. Gdy tekst nie mówi nic o swojej teraźniejszości – zostaje w kolejności księgi.",
+  "Psalm stoi przy historii, z którą łączy go tytuł albo treść (pewne, prawdopodobne, niepewne – zaznaczone przy psalmie). Psalmy bez takiej wskazówki są czytane w zbiorach.",
+  "List apostolski stoi tam, gdzie został napisany – według tego, co list mówi o miejscu, ludziach i wydarzeniach."
  ],
  "cut": [
   "Acts 18:12",

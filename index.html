@@ -16,6 +16,10 @@
 </head>
 <body>
 <div class="help-pop" id="helpPop" role="dialog" hidden></div>
+<dialog class="cx" id="chronDlg" aria-labelledby="chronTitle">
+  <div class="cx-head"><h2 id="chronTitle">Kolejność chronologiczna – uzasadnienie</h2><button type="button" class="icon-btn" id="chronClose" aria-label="Zamknij">✕</button></div>
+  <div class="cx-body" id="chronBody"></div>
+</dialog>
 
 <header>
   <div class="hdr-row">
@@ -91,6 +95,7 @@
       <option value="chron">Chronologicznie</option>
     </select>
     <p class="hint" id="orderHint" hidden></p>
+    <p class="hint"><button type="button" class="linkish" id="chronOpen">Uzasadnienie kolejności chronologicznej</button></p>
     <div id="noMixWrap">
       <label class="check"><input type="checkbox" id="noMixOn" checked> Nie łącz ksiąg w jednym dniu <button type="button" class="qb" data-h="nie_laczy" aria-label="Wyjaśnienie" aria-expanded="false">?</button></label>
       <div class="indent"><select id="noMixMode" aria-label="Tryb: nie łącz ksiąg">

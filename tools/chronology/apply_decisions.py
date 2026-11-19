@@ -128,7 +128,7 @@ if len(check) != len(set(check)): errors.append('werset w dwóch historiach')
 with open(path('data', 'chronology.json'), 'w', encoding='utf-8') as f:
     f.write('{\n "description": "Chronologia całej Biblii historiami. Wątek = kilka historii czytanych razem; historia = jedno wydarzenie (z relacjami równoległymi) albo jedna jednostka tekstu. Każdy werset wzorca jest dokładnie raz. Plan tnie najchętniej między wątkami, potem między historiami, wewnątrz historii tylko w ostateczności.",\n')
     f.write(' "source": "Kolejność według planu The One Year Chronological Bible (Tyndale), z decyzjami po przeczytaniu tekstu: sources/chronology/decisions.json. note = powód zmiany względem planu Tyndale.",\n')
-    f.write(' "versification": "org",\n "syntax": "refs: zakresy OSIS rozdział:werset[-[rozdział:]werset] w numeracji wzorca, rozdzielone średnikiem",\n "threads": [\n')
+    f.write(' "versification": "org",\n "rules": ' + json.dumps(D.get('rules', []), ensure_ascii=False) + ',\n "syntax": "refs: zakresy OSIS rozdział:werset[-[rozdział:]werset] w numeracji wzorca, rozdzielone średnikiem",\n "threads": [\n')
     f.write(',\n'.join('  {"name": ' + json.dumps(name, ensure_ascii=False) + ', "stories": [\n' + ',\n'.join('   ' + json.dumps(e, ensure_ascii=False) for e in sts) + '\n  ]}' for name, sts in out))
     f.write('\n ]\n}\n')
 print('BŁĘDY:' if errors else 'bez błędów', *errors, sep='\n  ')

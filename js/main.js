@@ -14,6 +14,7 @@ import {toCsv, download} from './export/csv.js';
 import {buildPrint, TEMPLATES} from './export/print.js';
 import {toIcs} from './export/ics.js';
 import {encodePlan, decodePlan, planUrl} from './share.js';
+import {renderChronology} from './ui/chronology.js';
 
 const S = {
   canon: null,
@@ -132,6 +133,9 @@ function wire(){
   $('pdf').addEventListener('click', exportPdf);
   $('ics').addEventListener('click', exportIcs);
   $('share').addEventListener('click', sharePlan);
+  $('chronOpen').addEventListener('click', openChronology);
+  $('chronClose').addEventListener('click', () => $('chronDlg').close());
+  $('chronDlg').addEventListener('click', e => { if(e.target === $('chronDlg')) $('chronDlg').close(); });
 }
 
 let raf = 0;
@@ -373,6 +377,13 @@ async function sharePlan(){
 }
 
 let toastTimer = 0;
+function openChronology(){
+  if(!S.tr) return;
+  renderChronology($('chronBody'), S.tr.chronology, S.tr.chronology.rules, formatter(), S.tr.info.name);
+  $('chronDlg').showModal();
+  $('chronBody').scrollTop = 0;
+}
+
 function toast(msg){
   const t = $('toast');
   t.textContent = msg; t.hidden = false;

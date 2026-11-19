@@ -168,6 +168,6 @@ export class Translation {
       }
       return {...meta[i], units};
     });
-    return {threads, stories, entries: stories.map(s => s.units), storyOf: owner, attached, shared, duplicates: shared.length};
+    return {threads, stories, entries: stories.map(s => s.units), storyOf: owner, attached, shared, duplicates: shared.length, rules: chron.rules || []};
   }
 }
