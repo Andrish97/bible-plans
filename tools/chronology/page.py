@@ -1,6 +1,10 @@
 import json,html,sys,os
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from common import path
 D=json.load(open(path('.cache','chronology','structured.json'),encoding='utf-8')); S=D['stories']; T=D['threads']
+_C=json.load(open(path('data','chronology.json'),encoding='utf-8'))
+_N=[st.get('name') for t in _C['threads'] for st in t['stories']]
+for _s,_n in zip(S,_N):
+    if _n: _s['title']=_n
 PL={b['id']:b['abbr']['pl'] for b in json.load(open(path('data','books.json'),encoding='utf-8'))['books']}
 def rng(ks):
     a,b=ks[0],ks[-1]
@@ -30,7 +34,7 @@ def build(t_from,t_to,part,subtitle,out):
 <div class="rules">
 <p><b>Historia</b> – jedno wydarzenie lub jedna sekcja tekstu, razem z relacjami równoległymi.</p>
 <p><b>Wątek</b> – kilka historii, które sensownie czytać razem. Plan najchętniej kończy dzień między wątkami, w razie potrzeby między historiami, wewnątrz historii tylko w ostateczności.</p>
-<p>Kolejność według planu Tyndale. Nazwy historii robocze (z nagłówków SNP dosłownego). Liczba = wersety. <span class="tag man">ręcznie</span> = moja decyzja po przeczytaniu tekstu.</p>
+<p>Kolejność według planu Tyndale. Nazwy historii własne (zgodne z treścią). Liczba = wersety. <span class="tag man">ręcznie</span> = moja decyzja po przeczytaniu tekstu.</p>
 </div>
 <div class="tools"><button type="button" id="all">Rozwiń wszystko</button><button type="button" id="none">Zwiń</button></div>
 {"".join(th)}
