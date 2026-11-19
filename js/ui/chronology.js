@@ -19,7 +19,7 @@ export function renderChronology(body, chron, rules, f, trName){
     a w środku historii tylko w ostateczności. Każdy werset jest w planie dokładnie raz.</p>`);
   parts.push(`<p class="cx-lead">Odnośniki w numeracji przekładu: ${esc(trName)}. ${withNotes} historii ma opisany powód swojego miejsca.</p>`);
   parts.push(`<h3>Zasady</h3><ol class="cx-rules">${rules.map(r => `<li>${esc(r)}</li>`).join('')}</ol>`);
-  parts.push(`<div class="cx-tools"><input type="search" id="cxFind" placeholder="Szukaj: nazwa wątku albo księga i rozdział, np. Iz 1 lub Ps 51" aria-label="Szukaj w chronologii">
+  parts.push(`<div class="cx-tools"><input type="search" id="cxFind" placeholder="Szukaj: nazwa wątku lub historii albo odnośnik, np. Iz 1, Ps 51, potop" aria-label="Szukaj w chronologii">
     <label class="check"><input type="checkbox" id="cxNotes"> Tylko historie z opisanym powodem</label>
     <button type="button" class="pill" id="cxAll">Rozwiń wszystko</button><button type="button" class="pill" id="cxNone">Zwiń</button></div>`);
   const th = chron.threads.map((t, n) => {
@@ -29,7 +29,9 @@ export function renderChronology(body, chron, rules, f, trName){
       const text = f.seqText(s.units);
       const tags = books.size > 1 ? '<span class="cx-tag">relacje równoległe</span>' : '';
       const note = s.note ? s.note.map(x => `<p class="cx-note">${esc(x)}</p>`).join('') : '';
-      return `<li data-q="${esc(text.toLowerCase())}"${s.note ? ' data-note="1"' : ''}><div class="cx-ref">${esc(text)}${tags}</div>${note}</li>`;
+      const q = ((s.name || '') + ' ' + text).toLowerCase();
+      const head = s.name ? `<div class="cx-sname">${esc(s.name)}</div><div class="cx-ref">${esc(text)}${tags}</div>` : `<div class="cx-ref">${esc(text)}${tags}</div>`;
+      return `<li data-q="${esc(q)}"${s.note ? ' data-note="1"' : ''}>${head}${note}</li>`;
     }).join('');
     const nNotes = sts.filter(s => s.note).length;
     return `<details class="cx-th" data-q="${esc(t.name.toLowerCase())}"><summary><span class="cx-n">${n + 1}</span><span class="cx-name">${esc(t.name)}</span>`

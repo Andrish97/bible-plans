@@ -114,15 +114,22 @@ os.makedirs(path('.cache', 'chronology'), exist_ok=True)
 json.dump({'stories': S, 'threads': threads}, open(path('.cache', 'chronology', 'structured.json'), 'w', encoding='utf-8'), ensure_ascii=False)
 # plik aplikacji: wątki -> historie -> zakresy; uwagi tylko przy decyzjach innych niż w planie Tyndale
 PFX = 'ręcznie (nie Tyndale): '
+NP = path('sources', 'chronology', 'names.json')
+NAMES = json.load(open(NP, encoding='utf-8')) if os.path.exists(NP) else {}
+used = set()
 out = []
 for n, (i, name) in enumerate(threads):
     sts = []
     for st in S[i:bounds[n + 1]]:
+        k0 = st['parts'][0]['ks'][0]; nk = f'{OSIS[k0[0]]} {k0[1]}:{k0[2]}'
         e = {'refs': '; '.join(compress(p['ks'])[0] for p in st['parts'])}
+        if nk in NAMES: e = {'name': NAMES[nk], **e}; used.add(nk)
+        elif NAMES: errors.append(f'historia bez nazwy: {nk}')
         notes = [w[len(PFX):] for w in st['why'] if w.startswith(PFX)]
         if notes: e['note'] = list(dict.fromkeys(notes))
         sts.append(e)
     out.append((name, sts))
+for nk in sorted(set(NAMES) - used): errors.append(f'nazwa bez historii: {nk}')
 check = [tuple(k) for st in S for p in st['parts'] for k in p['ks']]
 if len(check) != len(set(check)): errors.append('werset w dwóch historiach')
 with open(path('data', 'chronology.json'), 'w', encoding='utf-8') as f:

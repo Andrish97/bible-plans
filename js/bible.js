@@ -120,7 +120,7 @@ export class Translation {
       threads.push({name: th.name, first: meta.length, count: th.stories.length});
       for(const st of th.stories){
         const i = meta.length;
-        meta.push({thread: t, refs: st.refs, note: st.note});
+        meta.push({thread: t, name: st.name, refs: st.refs, note: st.note});
         const vs = [];
         for(const part of st.refs.split(';')){
           for(const [b, c, v] of this.orgRange(part)){

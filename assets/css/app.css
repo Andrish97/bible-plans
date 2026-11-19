@@ -275,7 +275,8 @@ dialog.cx::backdrop{background:rgba(0,0,0,.45)}
 .cx-meta{color:var(--muted);font-size:12px;white-space:nowrap}
 .cx-th ol{margin:0;padding:4px 14px 10px 38px}
 .cx-th li{margin:6px 0}
-.cx-ref{font-variant-numeric:tabular-nums}
+.cx-sname{font-weight:600}
+.cx-ref{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
 .cx-tag{display:inline-block;margin-left:8px;padding:0 7px;border-radius:999px;background:var(--chip);color:var(--muted);font-size:11px}
 .cx-note{margin:3px 0 0;padding:5px 9px;border-left:3px solid var(--accent2);background:var(--card);border-radius:0 6px 6px 0;font-size:13px;color:var(--ink)}
 .cx-empty{color:var(--muted)}
