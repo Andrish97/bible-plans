@@ -6,6 +6,16 @@ def owner_map():
     return {tuple(k):i for i,st in enumerate(S) for p in st['parts'] for k in p['ks']}
 errors=[]
 def kparts(st): return [tuple(p['ks'][0]) for p in st['parts']]
+# 0) cięcie części: nowa część zaczyna się od podanego wersetu
+for r in D.get('cut',[]):
+    k=list(key(r)); done=False
+    for st in S:
+        for n,p in enumerate(st['parts']):
+            if k in p['ks'] and p['ks'][0]!=k:
+                j=p['ks'].index(k); new=dict(p); new['ks']=p['ks'][j:]; new['title']=None; p['ks']=p['ks'][:j]
+                st['parts'].insert(n+1,new); done=True; break
+        if done: break
+    if not done: errors.append(f'cut: {r}')
 # 1) rozbicia: nowa historia zaczyna się od części, której pierwszy werset podano
 for r in D.get('split',[]):
     k=key(r); om=owner_map(); i=om.get(k)
