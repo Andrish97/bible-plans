@@ -2,7 +2,7 @@
 // Strategia „najpierw pamięć, w tle odświeżenie” (stale-while-revalidate): strona otwiera się od razu,
 // a nowa wersja plików pobiera się w tle i jest używana przy następnym otwarciu.
 // Przy zmianie listy plików podnieś VERSION (tools/check_sw.mjs pilnuje, że lista jest kompletna).
-const VERSION = 'v6';
+const VERSION = 'v7';
 const CACHE = 'plan-biblii-' + VERSION;
 const TRANSLATIONS = ['bw', 'snp', 'snpd', 'ubg', 'nbg', 'tnp'];
 

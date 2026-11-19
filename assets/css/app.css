@@ -51,7 +51,7 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
 
 /* przyciski w nagłówku */
 .hdr-actions{display:flex;align-items:center;gap:8px;flex:none}
-.install-btn{padding:6px 12px;font-size:12.5px}
+.install-btn[hidden]{display:none}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:80;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;box-shadow:var(--shadow);font-size:13.5px}
 
 /* przełącznik motywu: jeden przycisk z ikoną i menu */
@@ -230,6 +230,7 @@ th .short{display:none}
 @media (max-width:900px){
   .layout{padding:10px}
   header p{display:none}
+  header h1{white-space:normal;font-size:16px;line-height:1.2}
   .view-bar .stats{display:none}
   .view-btn{flex:1}
   .table-wrap{max-height:none}
